@@ -4,7 +4,7 @@ local EnemyService = {}
 
 
 function EnemyService:SpawnEnemy()
-    local killer = replicatedStorage:FindFirstChild("Enemy"):Clone()
+    local killer = replicatedStorage:FindFirstChild("Killer"):Clone()
     killer.Parent = workspace
     task.spawn(function()
         while killer.Parent do

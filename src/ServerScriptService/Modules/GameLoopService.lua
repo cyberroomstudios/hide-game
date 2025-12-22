@@ -51,10 +51,27 @@ function GameLoopService:WaitInitGame()
 end
 
 function GameLoopService:DrawKiller()
+	local players = Players:GetPlayers()
+
+	-- Limpa o atributo de todos
+	for _, player in ipairs(players) do
+		player:SetAttribute("IS_KILLER", false)
+	end
+
+	if #players == 1 then
+		local isKiller = math.random(1, 2) == 1
+		players[1]:SetAttribute("IS_KILLER", isKiller)
+	else
+		local killerIndex = math.random(1, #players)
+		local killerPlayer = players[killerIndex]
+
+		killerPlayer:SetAttribute("IS_KILLER", true)
+	end
+
 	-- TODO Adicionar Lógica de sortear o matador
 	workspace:SetAttribute("GAME_STEP", "DRAWING_THE_KILLER")
 
-	task.wait(3)
+	task.wait(5)
 end
 
 function GameLoopService:StartHideStep()
@@ -66,8 +83,6 @@ function GameLoopService:StartHideStep()
 		task.wait(1)
 	end
 end
-
-function GameLoopService:ShowInit() end
 
 function GameLoopService:StartKillerStep()
 	workspace:SetAttribute("GAME_STEP", "KILLER_IN_PROGRESS")

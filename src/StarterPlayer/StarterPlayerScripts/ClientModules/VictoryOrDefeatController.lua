@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
+local VictoryOrDefeatController = {}
 
-local VictoryOrDefeatService = {}
+local Players = game:GetService("Players")
 
 -- Init Bridg Net
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -14,17 +14,19 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- End Bridg Net
 
 local youSurvived
+local youDied
 
-function VictoryOrDefeatService:Init()
-	VictoryOrDefeatService:CreateReferences()
-	VictoryOrDefeatService:InitBridgeListener()
+function VictoryOrDefeatController:Init()
+	VictoryOrDefeatController:CreateReferences()
+	VictoryOrDefeatController:InitBridgeListener()
 end
 
-function VictoryOrDefeatService:CreateReferences()
+function VictoryOrDefeatController:CreateReferences()
 	youSurvived = UIReferences:GetReference("YOU_SURVIVED")
+	youDied = UIReferences:GetReference("YOU DIED")
 end
 
-function VictoryOrDefeatService:InitBridgeListener()
+function VictoryOrDefeatController:InitBridgeListener()
 	bridge:Connect(function(response)
 		if response[actionIdentifier] == "GiveVictimWins" then
 			youSurvived.Visible = true
@@ -32,6 +34,14 @@ function VictoryOrDefeatService:InitBridgeListener()
 				youSurvived.Visible = false
 			end)
 		end
+
+		if response[actionIdentifier] == "KillPlayer" then
+			youDied.Visible = true
+			task.delay(2, function()
+				youDied.Visible = false
+			end)
+		end
 	end)
 end
-return VictoryOrDefeatService
+
+return VictoryOrDefeatController

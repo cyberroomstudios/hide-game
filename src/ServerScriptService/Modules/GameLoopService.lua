@@ -80,7 +80,7 @@ function GameLoopService:GiveWin()
 	for _, player in Players:GetPlayers() do
 		pcall(function()
 			-- Da a Vitoria pro jogador
-			VictoryOrDefeatService:GiveVictimWin(player)
+			VictoryOrDefeatService:KillPlayer(player)
 
 			-- Manda o jogador de volta ao Lobby
 			GameTeleportService:TeleportWinnersToLobby(player)

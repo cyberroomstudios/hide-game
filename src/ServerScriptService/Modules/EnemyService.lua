@@ -19,14 +19,15 @@ local SHOW_PATH_DEBUG = true
 
 function EnemyService:Init()
 	print("Enemy Service Initialized")
+	EnemyService:InitBridgeListener()
 	self:SpawnEnemy()
 end
 
 function EnemyService:InitBridgeListener()
 	bridge.OnServerInvoke = function(player, data)
-		if data[actionIdentifier] == "GoTo" then
+		if data[actionIdentifier] == "GoToRoom" then
 			local roomNumber = data.data.RoomNumber
-			EnemyService:GoToRoom(player)
+			EnemyService:GoToRoom(player, roomNumber)
 		end
 	end
 end
@@ -99,9 +100,10 @@ function EnemyService:StartKiller()
 end
 
 function EnemyService:GoToRoom(player: Player, roomNumber: number)
-	-- TODO Verificar se o jogador é um Killer
+	-- TODO Verificar se o jogador é um Killer (player:GetAttribute("IS_KILLER") )
 	-- TODO Levar o jogador até o número do comodo indicado
 	-- TODO Matar todos os jogadores que estão nesse comodo  VictoryOrDefeatService:KillPlayer(player)
+	print("GO TO:" .. roomNumber)
 end
 
 return EnemyService

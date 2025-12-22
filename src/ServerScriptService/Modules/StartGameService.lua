@@ -40,6 +40,9 @@ end
 function StartGameService:InitPlayerAttributes(player: Player)
 	local lobbySpawn = UtilService:WaitForDescendants(workspace, "Map", "Lobby", "Spawn")
 	player:SetAttribute("LOBBY_SPAWN", lobbySpawn.CFrame)
+
+		local lobbyStartGame = UtilService:WaitForDescendants(workspace, "Map", "House", "Spawn")
+	player:SetAttribute("START_GAME_SPAWN", lobbyStartGame.CFrame)
 end
 
 return StartGameService

@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 -- Server Modules
-local PlayerDataHandler = require(ServerScriptService.Modules.Player.PlayerDataHandler)
+local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BridgeNet2 = require(ReplicatedStorage.Utility.BridgeNet2)
@@ -18,7 +18,7 @@ initializerBridge()
 local folder = ServerScriptService.Modules
 
 for _, module in folder:GetChildren() do
-	if module.Name == "Player" then
+	if module.Name == "PlayerDataHandler" then
 		continue
 	end
 

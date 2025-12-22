@@ -19,6 +19,7 @@ function StartGameController:Init(data)
 		data = {},
 	})
 
+	
 	TeleportController:ToLobbySpawn()
 end
 

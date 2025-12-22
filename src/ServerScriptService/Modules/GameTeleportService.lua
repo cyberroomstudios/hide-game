@@ -15,6 +15,7 @@ function GameTeleportService:Init() end
 
 function GameTeleportService:TeleportAllPlayersToHouse()
 	for _, player in Players:GetPlayers() do
+		player:SetAttribute("IN_HOUSE", true)
 		pcall(function()
 			bridge:Fire(player, {
 				[actionIdentifier] = "TeleportToHouse",
@@ -24,10 +25,10 @@ function GameTeleportService:TeleportAllPlayersToHouse()
 end
 
 function GameTeleportService:TeleportToLobby(player: Player)
+	player:SetAttribute("IN_HOUSE", false)
 	bridge:Fire(player, {
 		[actionIdentifier] = "TeleportToLobby",
 	})
 end
-
 
 return GameTeleportService

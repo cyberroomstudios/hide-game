@@ -23,7 +23,7 @@ end
 
 function VictoryOrDefeatController:CreateReferences()
 	youSurvived = UIReferences:GetReference("YOU_SURVIVED")
-	youDied = UIReferences:GetReference("YOU DIED")
+	youDied = UIReferences:GetReference("YOU_DIED")
 end
 
 function VictoryOrDefeatController:InitBridgeListener()

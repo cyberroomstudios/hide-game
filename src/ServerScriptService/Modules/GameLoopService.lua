@@ -79,11 +79,14 @@ function GameLoopService:GiveWin()
 
 	for _, player in Players:GetPlayers() do
 		pcall(function()
-			-- Da a Vitoria pro jogador
-			VictoryOrDefeatService:KillPlayer(player)
+			-- Verifica se o jogador ainda está dentro de casa
+			if player:GetAttribute("IN_HOUSE") then
+				-- Da a Vitoria pro jogador
+				VictoryOrDefeatService:GiveVictimWin(player)
 
-			-- Manda o jogador de volta ao Lobby
-			GameTeleportService:TeleportWinnersToLobby(player)
+				-- Manda o jogador de volta ao Lobby
+				GameTeleportService:TeleportWinnersToLobby(player)
+			end
 		end)
 	end
 end

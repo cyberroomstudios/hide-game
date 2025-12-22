@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local GameTeleportService = require(ServerScriptService.Modules.GameTeleportService)
+local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
+local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 
 local GameLoopService = {}
 
@@ -77,6 +79,10 @@ function GameLoopService:GiveWin()
 
 	for _, player in Players:GetPlayers() do
 		pcall(function()
+			-- Da a Vitoria pro jogador
+			VictoryOrDefeatService:GiveVictimWin(player)
+
+			-- Manda o jogador de volta ao Lobby
 			GameTeleportService:TeleportWinnersToLobby(player)
 		end)
 	end

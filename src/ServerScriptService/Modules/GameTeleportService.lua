@@ -23,10 +23,11 @@ function GameTeleportService:TeleportAllPlayersToHouse()
 	end
 end
 
-function GameTeleportService:TeleportWinnersToLobby(winnerPlayer: Player)
-	bridge:Fire(winnerPlayer, {
+function GameTeleportService:TeleportToLobby(player: Player)
+	bridge:Fire(player, {
 		[actionIdentifier] = "TeleportToLobby",
 	})
 end
+
 
 return GameTeleportService

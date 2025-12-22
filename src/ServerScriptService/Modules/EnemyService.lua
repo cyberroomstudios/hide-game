@@ -15,6 +15,7 @@ function EnemyService:SpawnEnemy()
 end
 
 function EnemyService:Init()
+    print("Enemy Service Initialized")
     self:SpawnEnemy()
 end
 

@@ -1,3 +1,4 @@
+
 local GameLoopService = {}
 
 function GameLoopService:Init()
@@ -5,9 +6,21 @@ function GameLoopService:Init()
 end
 
 function GameLoopService:Start()
-    while true do
-        workspace:SetAttribute("GAME_STEP", "WAITING_START_GAME")
-        task.spawn(5)
-    end
+  while true do
+    -- Inicializando Jogo
+
+  end
 end
+
+function GameLoopService:WaitInitGame()
+    
+end
+function GameLoopService:ShowInit()
+    
+end
+
+function GameLoopService:TeleportAllPlayers()
+    
+end
+
 return GameLoopService

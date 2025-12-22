@@ -15,4 +15,9 @@ end
 
 function UIManager:OpenLabel(labelName: string) end
 
+
+function UIManager:ShowWaitInitGame()
+	
+end
+
 return UIManager

@@ -11,6 +11,9 @@ local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
 local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- End Bridg Net
 
+
+
+
 local player = Players.LocalPlayer
 
 function StartGameController:Init(data)
@@ -19,6 +22,8 @@ function StartGameController:Init(data)
 		data = {},
 	})
 
+
+	
 	
 	TeleportController:ToLobbySpawn()
 end

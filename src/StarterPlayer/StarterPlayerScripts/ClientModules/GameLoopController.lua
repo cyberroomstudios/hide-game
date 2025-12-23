@@ -1,26 +1,28 @@
+local GameLoopController = {}
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
 
-local UIManager = {}
-
 local labels = {}
 local screens = {}
-local loadedModules = false
 
-function UIManager:Init()
-	UIManager:CreateReferences()
-	UIManager:InitAttributeListener()
+local loadedModules = false
+local player = Players.LocalPlayer
+
+function GameLoopController:Init()
+	GameLoopController:CreateReferences()
+	GameLoopController:InitAttributeListener()
 end
 
-function UIManager:CreateReferences()
+function GameLoopController:CreateReferences()
 	labels["WAIT_START_GAME"] = UIReferences:GetReference("WAIT_START_GAME")
 	labels["HIDE_MESSAGE"] = UIReferences:GetReference("HIDE_MESSAGE")
 	labels["KILLER_IN_PROGRESS"] = UIReferences:GetReference("KILLER_IN_PROGRESS")
 end
 
-function UIManager:LoadModules()
+function GameLoopController:LoadModules()
 	if not loadedModules then
 		loadedModules = true
 		local clientModules = Players.LocalPlayer.PlayerScripts.ClientModules
@@ -32,8 +34,8 @@ function UIManager:LoadModules()
 	end
 end
 
-function UIManager:Open(screenName: string)
-	UIManager:LoadModules()
+function GameLoopController:Open(screenName: string)
+	GameLoopController:LoadModules()
 	for _, screen in screens do
 		screen:Close()
 	end
@@ -45,13 +47,13 @@ function UIManager:Open(screenName: string)
 	screens[screenName]:Open()
 end
 
-function UIManager:Close(screenName: string)
+function GameLoopController:Close(screenName: string)
 	if screenName and screens[screenName] then
 		screens[screenName]:Close()
 	end
 end
 
-function UIManager:OpenLabel(labelName: string)
+function GameLoopController:OpenLabel(labelName: string)
 	for _, value in labels do
 		value.Visible = false
 	end
@@ -63,8 +65,8 @@ function UIManager:OpenLabel(labelName: string)
 	labels[labelName].Visible = true
 end
 
-function UIManager:ShowWaitInitGame()
-	UIManager:OpenLabel("WAIT_START_GAME")
+function GameLoopController:ShowWaitInitGame()
+	GameLoopController:OpenLabel("WAIT_START_GAME")
 	task.spawn(function()
 		while workspace:GetAttribute("GAME_STEP") == "WAIT_INIT_GAME" do
 			labels["WAIT_START_GAME"].Text = "The Game Will Start In " .. workspace:GetAttribute("TIME_FOR_INIT_GAME")
@@ -73,44 +75,51 @@ function UIManager:ShowWaitInitGame()
 	end)
 end
 
-function UIManager:ShowHideMessage()
-	UIManager:OpenLabel("HIDE_MESSAGE")
+function GameLoopController:ShowHideMessage()
+	GameLoopController:OpenLabel("HIDE_MESSAGE")
 	task.spawn(function()
+		local hideLabel = labels["HIDE_MESSAGE"]
+
 		while workspace:GetAttribute("GAME_STEP") == "PLAYERS_HIDING" do
 			local leftTime = workspace:GetAttribute("TIME_FOR_HIDE") or 10
-			labels["HIDE_MESSAGE"].Text = "Hide! (" .. tostring(leftTime) .. ")"
-			task.wait()
+			local isKiller = player:GetAttribute("IS_KILLER")
+
+			hideLabel.Text = isKiller and ("Waiting for the players to hide! (" .. leftTime .. ")")
+				or ("Hide! (" .. leftTime .. ")")
+
+			task.wait(1)
 		end
 	end)
 end
 
-function UIManager:ShowKillerInProgressMessage()
-	UIManager:OpenLabel("KILLER_IN_PROGRESS")
+function GameLoopController:ShowKillerInProgressMessage()
+	GameLoopController:OpenLabel("KILLER_IN_PROGRESS")
 end
 
-function UIManager:InitAttributeListener()
+function GameLoopController:InitAttributeListener()
 	workspace:GetAttributeChangedSignal("GAME_STEP"):Connect(function()
-		UIManager:VerifyGameStep()
+		GameLoopController:VerifyGameStep()
 	end)
 end
 
-function UIManager:VerifyGameStep()
+function GameLoopController:VerifyGameStep()
 	local gameStep = workspace:GetAttribute("GAME_STEP")
-	print(gameStep)
+
 	if gameStep == "WAIT_INIT_GAME" then
-		UIManager:ShowWaitInitGame()
+		GameLoopController:ShowWaitInitGame()
 	end
 
 	if gameStep == "DRAWING_THE_KILLER" then
-		UIManager:Open("ROULETTE")
+		GameLoopController:Open("ROULETTE")
 	end
 
 	if gameStep == "PLAYERS_HIDING" then
-		UIManager:ShowHideMessage()
+		GameLoopController:ShowHideMessage()
 	end
 
 	if gameStep == "KILLER_IN_PROGRESS" then
-		UIManager:ShowKillerInProgressMessage()
+		GameLoopController:ShowKillerInProgressMessage()
 	end
 end
-return UIManager
+
+return GameLoopController

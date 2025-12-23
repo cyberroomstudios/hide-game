@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Utility = ReplicatedStorage.Utility
 local BridgeNet2 = require(Utility.BridgeNet2)
 local TeleportController = require(Players.LocalPlayer.PlayerScripts.ClientModules.TeleportController)
-local UIManager = require(Players.LocalPlayer.PlayerScripts.ClientModules.UIManager)
+local GameLoopController = require(Players.LocalPlayer.PlayerScripts.ClientModules.GameLoopController)
 local bridge = BridgeNet2.ReferenceBridge("StartGameService")
 local actionIdentifier = BridgeNet2.ReferenceIdentifier("action")
 local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
@@ -21,7 +21,7 @@ function StartGameController:Init(data)
 	})
 
 	TeleportController:ToLobbySpawn()
-	UIManager:VerifyGameStep()
+	GameLoopController:VerifyGameStep()
 end
 
 return StartGameController

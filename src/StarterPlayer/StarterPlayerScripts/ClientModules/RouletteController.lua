@@ -6,6 +6,7 @@ local player = Players.LocalPlayer
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
 local KillerHudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerHudController)
+local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules.CameraController)
 
 local screen
 local listFrame
@@ -85,9 +86,11 @@ function RouletteController:Start()
 		finalLabel.TextScaled = true
 		finalLabel.Text = FINAL_TEXT
 		finalLabel.Parent = listFrame
-	end)
 
-	
+		if isKiller then
+			CameraController:MoveToHouse()
+		end
+	end)
 end
 
 return RouletteController

@@ -90,34 +90,29 @@ function EnemyService:SpawnEnemy()
 	local killer = replicatedStorage:FindFirstChild("Killer"):Clone()
 	killer.Parent = workspace
 	killer.PrimaryPart:SetNetworkOwner(nil)
-	task.spawn(function()
-		while killer.Parent do
-
-			selectedRoom = nil
-
-			for x = 1, 5 do
-				if selectedRoom then
-					break
-				end
-				task.wait(1)
-			end
-
-			local randomPoint
-
-			if selectedRoom then
-				randomPoint = hiddenPoints:FindFirstChild(tostring(selectedRoom))
-			else
-				randomPoint =  hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
-			end
-			
-			local targetPoint = randomPoint
-
-			moveToTarget(killer, targetPoint)
-		end
-	end)
 	local totalHiddenPoints = #hiddenPoints:GetChildren()
 	while #hiddenPoints:GetChildren() > math.floor(totalHiddenPoints/2) do
-		task.wait(1)
+		selectedRoom = nil
+
+		for x = 1, 5 do
+			if selectedRoom then
+				break
+			end
+			task.wait(1)
+		end
+
+		local randomPoint
+
+		if selectedRoom then
+			randomPoint = hiddenPoints:FindFirstChild(tostring(selectedRoom))
+		else
+			randomPoint =  hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
+		end
+		
+		local targetPoint = randomPoint
+
+		moveToTarget(killer, targetPoint)
+		
 	end
 	killer:Destroy()
 end

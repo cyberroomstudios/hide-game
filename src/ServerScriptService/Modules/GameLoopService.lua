@@ -1,11 +1,11 @@
+local GameLoopService = {}
+
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local GameTeleportService = require(ServerScriptService.Modules.GameTeleportService)
 local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
-
-local GameLoopService = {}
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -32,7 +32,8 @@ function GameLoopService:Start()
 			-- 3° Teleporta todos os jogadores para a cada e manda se esconder
 			GameLoopService:StartHideStep()
 
-			-- 4° Inicializa o Killeg
+			-- 4° Inicializa o Killer
+			GameLoopService:StartKillerStep()
 
 			-- 5° Leva todos os jogadores Vencedores de Volta ao Lobby
 			GameLoopService:GiveWin()

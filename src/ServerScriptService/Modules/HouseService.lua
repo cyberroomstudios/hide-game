@@ -2,6 +2,11 @@ local HouseService = {}
 
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Resources = ReplicatedStorage:WaitForChild("Resources")
+local hiddenAttachment = Resources:WaitForChild("HiddenAttachment")
+local hiddenPoints = workspace:WaitForChild("HiddenPoints")
 
 local UtilService = require(ServerScriptService.Modules.UtilService)
 
@@ -80,11 +85,27 @@ function HouseService:SetRoomFromPlayers()
 
 			--  TODO se o jogador não estiver em nenhum comodo, leva ele pra um comodo aleatorio
 			if not roomNumber then
-				print("Jogador não está em nenhum comodo")
-				continue
+				local randomRoomNumber = math.random(1, #hiddenPoints:GetChildren())
+				roomNumber = randomRoomNumber
 			end
 
 			player:SetAttribute("ROOM_NUMBER", roomNumber)
+		end
+	end
+end
+
+-- Mostra o jogador como escondido
+function HouseService:ShowHiddenPlayers(player: Player)
+	for _ , point in pairs(hiddenPoints:GetChildren()) do
+		local attachment = hiddenAttachment:Clone()
+		attachment.Parent = point
+		local imageTemplate = attachment:FindFirstChild("ImageTemplate", true)
+		local frame = attachment:FindFirstChild("Frame", true)
+
+		local playersInside = HouseService:GetAllPlayersFromRoom(tonumber(point.Name))
+
+		for x = 1 , #playersInside do
+			imageTemplate:Clone().Parent = frame
 		end
 	end
 end

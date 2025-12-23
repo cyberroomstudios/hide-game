@@ -52,6 +52,7 @@ function RouletteController:Start()
 		local index = ((i - 1) % #items) + 1
 
 		local label = Instance.new("TextLabel")
+		label.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
 		label.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT)
 		label.Position = UDim2.new(0, 0, 0, (i - 1) * ITEM_HEIGHT)
 		label.BackgroundTransparency = 1
@@ -81,6 +82,7 @@ function RouletteController:Start()
 		listFrame.Position = UDim2.new(0, 0, 0, 0)
 
 		local finalLabel = Instance.new("TextLabel")
+		finalLabel.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
 		finalLabel.Size = UDim2.new(1, 0, 1, 0)
 		finalLabel.BackgroundTransparency = 1
 		finalLabel.TextScaled = true

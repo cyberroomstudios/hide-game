@@ -124,6 +124,16 @@ function EnemyService:SpawnEnemy()
 	killer:Destroy()
 end
 
+function EnemyService:ClearPoints()
+	for _, point in pairs(hiddenPoints:GetChildren()) do
+		point:ClearAllChildren()
+	end
+	for _, point in pairs(killedPoints:GetChildren()) do
+		point:ClearAllChildren()
+	end
+end
+
+
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
 	for _, point in pairs(killedPoints:GetChildren()) do
@@ -131,6 +141,7 @@ function EnemyService:StartKiller()
 		point.Parent = hiddenPoints
 	end
 	self:SpawnEnemy()
+	self:ClearPoints()
 end
 
 function EnemyService:KillAllPlayersFromRoom(roomNumber: number)

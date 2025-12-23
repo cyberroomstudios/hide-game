@@ -89,6 +89,9 @@ function GameLoopService:StartHideStep()
 	-- Define o comodo de todos os jogadores
 	HouseService:SetRoomFromPlayers()
 
+	-- Mostra os jogadores como escondidos
+	HouseService:ShowHiddenPlayers()
+
 	-- Muda a Visão de todos as vitimas
 	CameraService:SetAllVictimsToTopViewHouse()
 end

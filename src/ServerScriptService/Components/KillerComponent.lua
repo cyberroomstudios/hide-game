@@ -15,7 +15,7 @@ local Trove = require(Packages.Trove)
 -- ===========================================================================
 -- Variables
 -- ===========================================================================
-local hiddenPoints = workspace:WaitForChild("HIddenPoints")
+local hiddenPoints = workspace:WaitForChild("HiddenPoints")
 
 -- Variável para ativar/desativar visualização do path
 local SHOW_PATH_DEBUG = true

@@ -10,6 +10,7 @@ local Packages = ReplicatedStorage.Packages
 local Component = require(Packages.Component)
 local Trove = require(Packages.Trove)
 
+print("Door Component Started")
 -- ===========================================================================
 -- Variables
 -- ===========================================================================
@@ -65,7 +66,7 @@ function DoorComponent:Start()
 	local instance = self.Instance
     local hitbox = instance:FindFirstChild("Hitbox")
     local hinge = instance:FindFirstChild("Hinge")
-    local tween = TweenService:Create(hinge, TweenInfoOpen, {CFrame = hinge.CFrame * CFrame.Angles(0, math.rad(90), 0)})
+    local tween
     local debounce = false
     if hitbox then
         self.Trove:Add(hitbox.Touched:Connect(function(otherPart)
@@ -74,10 +75,12 @@ function DoorComponent:Start()
             if humanoid then
                 if debounce then return end
                 debounce = true
+                tween = TweenService:Create(hinge, TweenInfoOpen, {CFrame = hinge.CFrame * CFrame.Angles(0, math.rad(90), 0)})
                 tween:Play()
                 tween.Completed:Wait()
                 task.wait(2) -- Tempo que a porta fica aberta
-                tween:Play():Reverse()
+                tween = TweenService:Create(hinge, TweenInfoOpen, {CFrame = hinge.CFrame * CFrame.Angles(0, math.rad(-90), 0)})
+                tween:Play()
                 tween.Completed:Wait()
                 debounce = false
             end

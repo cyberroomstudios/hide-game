@@ -2,7 +2,7 @@ local EnemyService = {}
 
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local PathfindingService = game:GetService("PathfindingService")
-local hiddenPoints = workspace:WaitForChild("HIddenPoints")
+local hiddenPoints = workspace:WaitForChild("HiddenPoints")
 
 -- Init Bridg Net
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

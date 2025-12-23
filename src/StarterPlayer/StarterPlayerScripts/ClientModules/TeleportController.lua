@@ -12,12 +12,18 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-function TeleportController:Init() end
+function TeleportController:Init()
+	TeleportController:InitBridgeListener()
+end
 
 function TeleportController:InitBridgeListener()
 	bridge:Connect(function(response)
-		if response[actionIdentifier] == "TeleportToStartGame" then
+		if response[actionIdentifier] == "TeleportToHouse" then
 			TeleportController:ToStartGame()
+		end
+
+		if response[actionIdentifier] == "TeleportToLobby" then
+			TeleportController:ToLobbySpawn()
 		end
 	end)
 end

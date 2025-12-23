@@ -17,6 +17,7 @@ end
 function UIManager:CreateReferences()
 	labels["WAIT_START_GAME"] = UIReferences:GetReference("WAIT_START_GAME")
 	labels["HIDE_MESSAGE"] = UIReferences:GetReference("HIDE_MESSAGE")
+	labels["KILLER_IN_PROGRESS"] = UIReferences:GetReference("KILLER_IN_PROGRESS")
 end
 
 function UIManager:LoadModules()
@@ -75,11 +76,16 @@ end
 function UIManager:ShowHideMessage()
 	UIManager:OpenLabel("HIDE_MESSAGE")
 	task.spawn(function()
-		while workspace:GetAttribute("GAME_STEP") == "HIDE" do
-			labels["HIDE_MESSAGE"].Text = "Hide! (" .. workspace:GetAttribute("TIME_FOR_HIDE") or 0 .. ")"
+		while workspace:GetAttribute("GAME_STEP") == "PLAYERS_HIDING" do
+			local leftTime = workspace:GetAttribute("TIME_FOR_HIDE") or 10
+			labels["HIDE_MESSAGE"].Text = "Hide! (" .. tostring(leftTime) .. ")"
 			task.wait()
 		end
 	end)
+end
+
+function UIManager:ShowKillerInProgressMessage()
+	UIManager:OpenLabel("KILLER_IN_PROGRESS")
 end
 
 function UIManager:InitAttributeListener()
@@ -90,7 +96,7 @@ end
 
 function UIManager:VerifyGameStep()
 	local gameStep = workspace:GetAttribute("GAME_STEP")
-
+	print(gameStep)
 	if gameStep == "WAIT_INIT_GAME" then
 		UIManager:ShowWaitInitGame()
 	end
@@ -99,8 +105,12 @@ function UIManager:VerifyGameStep()
 		UIManager:Open("ROULETTE")
 	end
 
-	if gameStep == "HIDE" then
+	if gameStep == "PLAYERS_HIDING" then
 		UIManager:ShowHideMessage()
+	end
+
+	if gameStep == "KILLER_IN_PROGRESS" then
+		UIManager:ShowKillerInProgressMessage()
 	end
 end
 return UIManager

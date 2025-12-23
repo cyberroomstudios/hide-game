@@ -9,7 +9,6 @@ local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefe
 local EnemyService = require(ServerScriptService.Modules.EnemyService)
 local HouseService = require(ServerScriptService.Modules.HouseService)
 
-
 function GameLoopService:Init()
 	GameLoopService:Start()
 end
@@ -63,7 +62,7 @@ function GameLoopService:DrawKiller()
 
 	if #players == 1 then
 		local isKiller = math.random(1, 2) == 1
-		players[1]:SetAttribute("IS_KILLER", isKiller)
+		players[1]:SetAttribute("IS_KILLER", false)
 	else
 		local killerIndex = math.random(1, #players)
 		local killerPlayer = players[killerIndex]
@@ -88,7 +87,6 @@ function GameLoopService:StartHideStep()
 
 	-- Define o comodo de todos os jogadores
 	HouseService:SetRoomFromPlayers()
-
 end
 
 function GameLoopService:StartKillerStep()

@@ -12,7 +12,7 @@ function HouseService:GetPartRoom(roomNumber: number)
 
 	for _, floor in floors:GetChildren() do
 		if floor:GetAttribute("ROOM_NUMBER") and tonumber(floor:GetAttribute("ROOM_NUMBER")) == roomNumber then
-			return floor
+			return floor.PrimaryPart
 		end
 	end
 end
@@ -56,8 +56,8 @@ function HouseService:GetRoomFromPlayer(player: Player)
 	for _, floor in floors:GetChildren() do
 		local roomNumber = floor:GetAttribute("ROOM_NUMBER")
 		if roomNumber then
-			local partPos = Vector3.new(floor.Position.X, 0, floor.Position.Z)
-			local halfSize = Vector3.new(floor.Size.X / 2, 0, floor.Size.Z / 2)
+			local partPos = Vector3.new(floor.PrimaryPart.Position.X, 0, floor.PrimaryPart.Position.Z)
+			local halfSize = Vector3.new(floor.PrimaryPart.Size.X / 2, 0, floor.PrimaryPart.Size.Z / 2)
 
 			local isInside = math.abs(playerPos.X - partPos.X) <= halfSize.X
 				and math.abs(playerPos.Z - partPos.Z) <= halfSize.Z
@@ -74,7 +74,7 @@ end
 -- Define o comodo de todos os jogadores
 function HouseService:SetRoomFromPlayers()
 	for _, player in Players:GetPlayers() do
-		if player:GetAttribute("IN_HOUSE") then
+		if player:GetAttribute("IN_HOUSE") and not player:GetAttribute("IS_KILLER") then
 			-- Obtem em qual comodo o jogador está
 			local roomNumber = HouseService:GetRoomFromPlayer(player)
 

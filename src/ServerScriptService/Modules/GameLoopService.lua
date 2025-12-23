@@ -7,6 +7,8 @@ local GameTeleportService = require(ServerScriptService.Modules.GameTeleportServ
 local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 local EnemyService = require(ServerScriptService.Modules.EnemyService)
+local HouseService = require(ServerScriptService.Modules.HouseService)
+
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -83,6 +85,10 @@ function GameLoopService:StartHideStep()
 		workspace:SetAttribute("TIME_FOR_HIDE", i)
 		task.wait(1)
 	end
+
+	-- Define o comodo de todos os jogadores
+	HouseService:SetRoomFromPlayers()
+
 end
 
 function GameLoopService:StartKillerStep()

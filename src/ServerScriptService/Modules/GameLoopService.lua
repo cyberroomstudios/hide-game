@@ -6,6 +6,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local GameTeleportService = require(ServerScriptService.Modules.GameTeleportService)
 local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
+local EnemyService = require(ServerScriptService.Modules.EnemyService)
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -86,7 +87,7 @@ end
 
 function GameLoopService:StartKillerStep()
 	workspace:SetAttribute("GAME_STEP", "KILLER_IN_PROGRESS")
-	task.wait(10)
+	EnemyService:StartKiller()
 end
 
 function GameLoopService:GiveWin()

@@ -7,6 +7,7 @@ local killedPoints = workspace:WaitForChild("KilledPoints")
 
 -- Init Bridg Net
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Utility = ReplicatedStorage.Utility
 local BridgeNet2 = require(Utility.BridgeNet2)
 local bridge = BridgeNet2.ReferenceBridge("KillerService")
@@ -14,6 +15,9 @@ local actionIdentifier = BridgeNet2.ReferenceIdentifier("action")
 local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
 local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- End Bridg Net
+
+local HouseService = require(ServerScriptService.Modules.HouseService)
+local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 
 -- Variável para ativar/desativar visualização do path
 local SHOW_PATH_DEBUG = true
@@ -113,6 +117,9 @@ function EnemyService:SpawnEnemy()
 		local targetPoint = randomPoint
 
 		moveToTarget(killer, targetPoint)
+
+		-- Mata todos os jogadores do comodo
+		EnemyService:KillAllPlayersFromRoom(tonumber(randomPoint.Name))
 	end
 	killer:Destroy()
 end
@@ -126,4 +133,12 @@ function EnemyService:StartKiller()
 	self:SpawnEnemy()
 end
 
+function EnemyService:KillAllPlayersFromRoom(roomNumber: number)
+	-- Obtem todos os jogadores do Room
+	local playersFromRoom = HouseService:GetAllPlayersFromRoom(roomNumber)
+
+	for _, player in playersFromRoom do
+		VictoryOrDefeatService:KillPlayer(player)
+	end
+end
 return EnemyService

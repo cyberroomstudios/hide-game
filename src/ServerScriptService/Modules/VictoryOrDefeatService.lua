@@ -13,6 +13,7 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 
 local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local GameTeleportService = require(ServerScriptService.Modules.GameTeleportService)
+local CameraService = require(ServerScriptService.Modules.CameraService)
 
 function VictoryOrDefeatService:Init() end
 
@@ -33,6 +34,9 @@ function VictoryOrDefeatService:KillPlayer(player: Player)
 	PlayerDataHandler:Update(player, "victimMurdered", function(current)
 		return current + 1
 	end)
+
+	-- Reseta a camera e libera os movimentos
+	CameraService:ResetInHouseFromPlayer(player)
 
 	-- Manda o jogador de volta ao Lobby
 	GameTeleportService:TeleportToLobby(player)

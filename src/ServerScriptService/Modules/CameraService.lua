@@ -24,7 +24,6 @@ function CameraService:SetAllVictimsToTopViewHouse()
 	end
 end
 
-
 -- Define a visão de top View para todos as vitimas
 function CameraService:ResetAllPlayersInHouse()
 	for _, player in Players:GetPlayers() do
@@ -33,6 +32,14 @@ function CameraService:ResetAllPlayersInHouse()
 				[actionIdentifier] = "Reset",
 			})
 		end
+	end
+end
+
+function CameraService:ResetInHouseFromPlayer(player: Player)
+	if player:GetAttribute("IN_HOUSE") then
+		bridge:Fire(player, {
+			[actionIdentifier] = "Reset",
+		})
 	end
 end
 

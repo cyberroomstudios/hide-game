@@ -148,7 +148,6 @@ end
     At this point in time, it is safe to grab other components also bound to the same instance.
 ]]
 function KillerComponent:Start()
-	print("Killer Component Started")
 	local instance = self.Instance
 	instance:SetAttribute("State", "Idle")
 	local humanoid = instance:FindFirstChildOfClass("Humanoid")

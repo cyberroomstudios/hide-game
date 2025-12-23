@@ -15,7 +15,7 @@ local Trove = require(Packages.Trove)
 -- ===========================================================================
 -- Variables
 -- ===========================================================================
-local hiddenPoints = workspace:WaitForChild("HIddenPoints")
+local hiddenPoints = workspace:WaitForChild("HiddenPoints")
 
 -- Variável para ativar/desativar visualização do path
 local SHOW_PATH_DEBUG = true
@@ -148,7 +148,6 @@ end
     At this point in time, it is safe to grab other components also bound to the same instance.
 ]]
 function KillerComponent:Start()
-	print("Killer Component Started")
 	local instance = self.Instance
 	instance:SetAttribute("State", "Idle")
 	local humanoid = instance:FindFirstChildOfClass("Humanoid")

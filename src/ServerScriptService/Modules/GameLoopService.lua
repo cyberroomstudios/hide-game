@@ -15,18 +15,20 @@ function GameLoopService:Init()
 end
 
 function GameLoopService:Start()
-	while true do
-		-- Loop
+	task.spawn(function()
+		while true do
+			-- Loop
 
-		-- 1º Aguarda um tempo para inicializar o Round
-		GameLoopService:WaitInitGame()
+			-- 1º Aguarda um tempo para inicializar o Round
+			GameLoopService:WaitInitGame()
 
-		-- 2º Sorteia um jogador para ser o Matador e mostra para os jogadores
-		GameLoopService:DrawKiller()
+			-- 2º Sorteia um jogador para ser o Matador e mostra para os jogadores
+			GameLoopService:DrawKiller()
 
-		-- 3° Teleporta todos os jogadores para a cada e manda se esconder
-		GameLoopService:StartHideStep()
-	end
+			-- 3° Teleporta todos os jogadores para a cada e manda se esconder
+			GameLoopService:StartHideStep()
+		end
+	end)
 end
 
 function GameLoopService:WaitInitGame()

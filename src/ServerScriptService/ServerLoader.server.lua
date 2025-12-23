@@ -1,11 +1,21 @@
 local Players = game:GetService("Players")
-local ServerScriptService = game:GetService("ServerScriptService")
-
--- Server Modules
-local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
+local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Utility = ReplicatedStorage.Utility
+local Loader = require(Utility.Loader)
+
+-- Server Utility
+local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
+
+local Middleware = {}
 
 local BridgeNet2 = require(ReplicatedStorage.Utility.BridgeNet2)
+
+local Content = {
+	{ "Component", ServerScriptService.Components, "AfterKnit" },
+}
+
 
 PlayerDataHandler:Init()
 
@@ -18,6 +28,7 @@ initializerBridge()
 local folder = ServerScriptService.Modules
 
 for _, module in folder:GetChildren() do
+	print("Initializing module:", module.Name)
 	if module.Name == "PlayerDataHandler" then
 		continue
 	end
@@ -29,3 +40,7 @@ for _, module in folder:GetChildren() do
 		file:Init()
 	end
 end
+
+Loader(Content, Middleware):andThen(function()
+	workspace:SetAttribute("ServerLoaded", true)
+end)

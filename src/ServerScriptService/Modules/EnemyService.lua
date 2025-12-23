@@ -1,8 +1,9 @@
 local EnemyService = {}
-
+local Players = game:GetService("Players")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local PathfindingService = game:GetService("PathfindingService")
 local hiddenPoints = workspace:WaitForChild("HiddenPoints")
+local killedPoints = workspace:WaitForChild("KilledPoints")
 
 -- Init Bridg Net
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,6 +18,8 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- Variável para ativar/desativar visualização do path
 local SHOW_PATH_DEBUG = true
 
+local selectedRoom = nil
+
 function EnemyService:Init()
 	print("Enemy Service Initialized")
 	EnemyService:InitBridgeListener()
@@ -26,7 +29,7 @@ function EnemyService:InitBridgeListener()
 	bridge.OnServerInvoke = function(player, data)
 		if data[actionIdentifier] == "GoToRoom" then
 			local roomNumber = data.data.RoomNumber
-			EnemyService:GoToRoom(player, roomNumber)
+			selectedRoom = roomNumber
 		end
 	end
 end
@@ -44,7 +47,8 @@ local function visualizeWaypoint(position, index)
 	part.Parent = workspace.Waypoints
 end
 
-local function moveToTarget(enemy, targetPosition)
+local function moveToTarget(enemy, targetPoint)
+	local targetPosition = targetPoint.Position
 	local humanoid = enemy:FindFirstChild("Humanoid")
 	local rootPart = enemy:FindFirstChild("HumanoidRootPart")
 
@@ -77,6 +81,8 @@ local function moveToTarget(enemy, targetPosition)
 			humanoid:MoveTo(waypoint.Position)
 			humanoid.MoveToFinished:Wait()
 		end
+		targetPoint.Color = Color3.fromRGB(255, 0, 0)
+		targetPoint.Parent = killedPoints
 	end
 end
 
@@ -86,24 +92,44 @@ function EnemyService:SpawnEnemy()
 	killer.PrimaryPart:SetNetworkOwner(nil)
 	task.spawn(function()
 		while killer.Parent do
-			local randomPoint = hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
-			local targetPosition = randomPoint.Position
 
-			moveToTarget(killer, targetPosition)
+			selectedRoom = nil
+
+			for x = 1, 5 do
+				if selectedRoom then
+					break
+				end
+				task.wait(1)
+			end
+
+			local randomPoint
+
+			if selectedRoom then
+				randomPoint = hiddenPoints:FindFirstChild(tostring(selectedRoom))
+			else
+				randomPoint =  hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
+			end
+			
+			local targetPoint = randomPoint
+
+			moveToTarget(killer, targetPoint)
 		end
 	end)
+	local totalHiddenPoints = #hiddenPoints:GetChildren()
+	while #hiddenPoints:GetChildren() > math.floor(totalHiddenPoints/2) do
+		task.wait(1)
+	end
+	killer:Destroy()
 end
 
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
+	for _ , point in pairs (killedPoints:GetChildren()) do
+		point.Color = Color3.fromRGB(0, 165, 5)
+		point.Parent = hiddenPoints
+	end
 	self:SpawnEnemy()
 end
 
-function EnemyService:GoToRoom(player: Player, roomNumber: number)
-	-- TODO Verificar se o jogador é um Killer (player:GetAttribute("IS_KILLER") )
-	-- TODO Levar o jogador até o número do comodo indicado
-	-- TODO Matar todos os jogadores que estão nesse comodo  VictoryOrDefeatService:KillPlayer(player)
-	print("GO TO:" .. roomNumber)
-end
 
 return EnemyService

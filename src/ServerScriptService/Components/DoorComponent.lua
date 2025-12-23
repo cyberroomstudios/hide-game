@@ -65,6 +65,7 @@ end
 function DoorComponent:Start()
 	local instance = self.Instance
     local hitbox = instance:FindFirstChild("Hitbox")
+    hitbox.Transparency = 1
     local hinge = instance:FindFirstChild("Hinge")
     local tween
     local debounce = false

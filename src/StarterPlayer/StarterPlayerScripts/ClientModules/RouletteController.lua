@@ -1,10 +1,11 @@
+local RouletteController = {}
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
-
-local RouletteController = {}
+local KillerHudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerHudController)
 
 local screen
 local listFrame
@@ -85,6 +86,8 @@ function RouletteController:Start()
 		finalLabel.Text = FINAL_TEXT
 		finalLabel.Parent = listFrame
 	end)
+
+	
 end
 
 return RouletteController

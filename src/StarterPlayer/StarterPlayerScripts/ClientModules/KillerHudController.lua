@@ -14,7 +14,7 @@ local Players = game:GetService("Players")
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
 
-local killerHud
+local screen
 
 function KillerHudController:Init()
 	KillerHudController:CreateReferences()
@@ -22,17 +22,29 @@ function KillerHudController:Init()
 end
 
 function KillerHudController:CreateReferences()
-	killerHud = UIReferences:GetReference("KILLER_HUD")
+	screen = UIReferences:GetReference("KILLER_HUD")
+end
+
+function KillerHudController:Open(data)
+	screen.Visible = true
+end
+
+function KillerHudController:Close()
+	screen.Visible = false
+end
+
+function KillerHudController:GetScreen()
+	return screen
 end
 
 function KillerHudController:InitButtonListerns()
-	local buttons = killerHud:WaitForChild("Buttons")
+	local buttons = screen:WaitForChild("Buttons")
 
 	for _, value in buttons:GetChildren() do
 		if value:IsA("TextButton") then
 			value.MouseButton1Click:Connect(function()
 				local roomNumber = value:GetAttribute("ROOM_NUMBER")
-				print(roomNumber)
+
 				local result = bridge:InvokeServerAsync({
 					[actionIdentifier] = "GoToRoom",
 					data = {

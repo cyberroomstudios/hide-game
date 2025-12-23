@@ -32,8 +32,7 @@ function GameLoopService:Start()
 			-- 3° Teleporta todos os jogadores para a cada e manda se esconder
 			GameLoopService:StartHideStep()
 
-			-- 4° Inicializa o Killer
-			GameLoopService:StartKillerStep()
+			-- 4° Inicializa o Killeg
 
 			-- 5° Leva todos os jogadores Vencedores de Volta ao Lobby
 			GameLoopService:GiveWin()

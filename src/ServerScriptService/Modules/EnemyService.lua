@@ -91,7 +91,8 @@ function EnemyService:SpawnEnemy()
 	killer.Parent = workspace
 	killer.PrimaryPart:SetNetworkOwner(nil)
 	local totalHiddenPoints = #hiddenPoints:GetChildren()
-	while #hiddenPoints:GetChildren() > math.floor(totalHiddenPoints/2) do
+
+	while #hiddenPoints:GetChildren() > math.floor(totalHiddenPoints / 2) do
 		selectedRoom = nil
 
 		for x = 1, 5 do
@@ -106,25 +107,23 @@ function EnemyService:SpawnEnemy()
 		if selectedRoom then
 			randomPoint = hiddenPoints:FindFirstChild(tostring(selectedRoom))
 		else
-			randomPoint =  hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
+			randomPoint = hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
 		end
-		
+
 		local targetPoint = randomPoint
 
 		moveToTarget(killer, targetPoint)
-		
 	end
 	killer:Destroy()
 end
 
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
-	for _ , point in pairs (killedPoints:GetChildren()) do
+	for _, point in pairs(killedPoints:GetChildren()) do
 		point.Color = Color3.fromRGB(0, 165, 5)
 		point.Parent = hiddenPoints
 	end
 	self:SpawnEnemy()
 end
-
 
 return EnemyService

@@ -8,6 +8,7 @@ local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 local EnemyService = require(ServerScriptService.Modules.EnemyService)
 local HouseService = require(ServerScriptService.Modules.HouseService)
+local CameraService = require(ServerScriptService.Modules.CameraService)
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -87,25 +88,32 @@ function GameLoopService:StartHideStep()
 
 	-- Define o comodo de todos os jogadores
 	HouseService:SetRoomFromPlayers()
+
+	-- Muda a Visão de todos as vitimas
+	CameraService:SetAllVictimsToTopViewHouse()
 end
 
 function GameLoopService:StartKillerStep()
 	workspace:SetAttribute("GAME_STEP", "KILLER_IN_PROGRESS")
-	EnemyService:StartKiller()
+	--	EnemyService:StartKiller()
+	task.wait(5)
 end
 
 function GameLoopService:GiveWin()
 	workspace:SetAttribute("GAME_STEP", "RETURNING_WINNERS")
 
+	-- Reseta a visão de todos os jogadores na casa
+	CameraService:ResetAllPlayersInHouse()
+
 	for _, player in Players:GetPlayers() do
 		pcall(function()
 			-- Verifica se o jogador ainda está dentro de casa
 			if player:GetAttribute("IN_HOUSE") then
+				-- Manda o jogador de volta ao Lobby
+				GameTeleportService:TeleportToLobby(player)
+
 				-- Da a Vitoria pro jogador
 				VictoryOrDefeatService:GiveVictimWin(player)
-
-				-- Manda o jogador de volta ao Lobby
-				GameTeleportService:TeleportWinnersToLobby(player)
 			end
 		end)
 	end

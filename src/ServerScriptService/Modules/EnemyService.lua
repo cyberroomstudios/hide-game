@@ -20,7 +20,6 @@ local SHOW_PATH_DEBUG = true
 function EnemyService:Init()
 	print("Enemy Service Initialized")
 	EnemyService:InitBridgeListener()
-	self:SpawnEnemy()
 end
 
 function EnemyService:InitBridgeListener()
@@ -97,6 +96,7 @@ end
 
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
+	self:SpawnEnemy()
 end
 
 function EnemyService:GoToRoom(player: Player, roomNumber: number)

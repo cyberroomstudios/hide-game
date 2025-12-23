@@ -141,4 +141,5 @@ function EnemyService:KillAllPlayersFromRoom(roomNumber: number)
 		VictoryOrDefeatService:KillPlayer(player)
 	end
 end
+
 return EnemyService

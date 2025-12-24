@@ -11,8 +11,8 @@ local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules
 local screen
 local listFrame
 
-local ITEM_HEIGHT = 50
-local SPINS = 5
+local SPINS = 4
+local ITEM_SCALE_Y = 0.25
 
 function RouletteController:Init()
 	RouletteController:CreateReferences()
@@ -37,53 +37,56 @@ function RouletteController:GetScreen()
 end
 
 function RouletteController:Start()
-	-- Resultado baseado no atributo
 	local isKiller = player:GetAttribute("IS_KILLER") == true
 	local FINAL_TEXT = isKiller and "Killer" or "Victim"
 
-	-- Limpa antes
 	listFrame:ClearAllChildren()
-	listFrame.Position = UDim2.new(0, 0, 0, 0)
+	listFrame.Position = UDim2.fromScale(0, 0)
 
-	-- Itens fake para rolagem
 	local items = { "Victim", "Killer" }
+	local totalItems = #items * SPINS
 
-	for i = 1, (#items * SPINS) do
+	for i = 1, totalItems do
 		local index = ((i - 1) % #items) + 1
+		local text = items[index]
+
+		-- FORÇA O ÚLTIMO ITEM A SER O RESULTADO
+		if i == totalItems then
+			text = FINAL_TEXT
+		end
 
 		local label = Instance.new("TextLabel")
 		label.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
-		label.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT)
-		label.Position = UDim2.new(0, 0, 0, (i - 1) * ITEM_HEIGHT)
+		label.Size = UDim2.fromScale(1, ITEM_SCALE_Y)
+		label.Position = UDim2.fromScale(0, (i - 1) * ITEM_SCALE_Y)
 		label.BackgroundTransparency = 1
 		label.TextScaled = true
-		label.Text = items[index]
+		label.Text = text
 		label.Parent = listFrame
 	end
 
-	listFrame.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT * #items * SPINS)
+	-- altura total da lista
+	listFrame.Size = UDim2.fromScale(1, totalItems * ITEM_SCALE_Y)
 
-	-- Calcula parada
-	local resultIndex = table.find(items, FINAL_TEXT)
-	local stopIndex = (SPINS - 1) * #items + (resultIndex - 1)
-	local stopPosition = -(stopIndex * ITEM_HEIGHT)
+	-- PARA SEMPRE NO ÚLTIMO ITEM
+	local stopScaleY = -((totalItems - 1) * ITEM_SCALE_Y)
 
-	-- Tween
-	local tweenInfo = TweenInfo.new(2.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-
-	local tween = TweenService:Create(listFrame, tweenInfo, { Position = UDim2.new(0, 0, 0, stopPosition) })
+	local tween = TweenService:Create(
+		listFrame,
+		TweenInfo.new(2.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+		{ Position = UDim2.fromScale(0, stopScaleY) }
+	)
 
 	tween:Play()
 
-	-- mostra só o item final
 	tween.Completed:Once(function()
 		listFrame:ClearAllChildren()
-		listFrame.Size = UDim2.new(1, 0, 0, ITEM_HEIGHT)
-		listFrame.Position = UDim2.new(0, 0, 0, 0)
+		listFrame.Size = UDim2.fromScale(1, 1)
+		listFrame.Position = UDim2.fromScale(0, 0)
 
 		local finalLabel = Instance.new("TextLabel")
 		finalLabel.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
-		finalLabel.Size = UDim2.new(1, 0, 1, 0)
+		finalLabel.Size = UDim2.fromScale(1, 1)
 		finalLabel.BackgroundTransparency = 1
 		finalLabel.TextScaled = true
 		finalLabel.Text = FINAL_TEXT

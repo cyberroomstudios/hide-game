@@ -110,4 +110,5 @@ function HouseService:ShowHiddenPlayers(player: Player)
 	end
 end
 
+
 return HouseService

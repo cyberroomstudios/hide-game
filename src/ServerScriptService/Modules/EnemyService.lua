@@ -5,6 +5,9 @@ local PathfindingService = game:GetService("PathfindingService")
 local hiddenPoints = workspace:WaitForChild("HiddenPoints")
 local killedPoints = workspace:WaitForChild("KilledPoints")
 
+local Resources = replicatedStorage:WaitForChild("Resources")
+local Killers = Resources:WaitForChild("Killers")
+
 -- Init Bridg Net
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -20,7 +23,7 @@ local HouseService = require(ServerScriptService.Modules.HouseService)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 
 -- Variável para ativar/desativar visualização do path
-local SHOW_PATH_DEBUG = true
+local SHOW_PATH_DEBUG = false
 
 local selectedRoom = nil
 
@@ -87,11 +90,23 @@ local function moveToTarget(enemy, targetPoint)
 		end
 		targetPoint.Color = Color3.fromRGB(255, 0, 0)
 		targetPoint.Parent = killedPoints
+
+		for _ , imageLabel in pairs(targetPoint:GetDescendants()) do
+			if imageLabel:IsA("ImageLabel") then
+				if imageLabel.Name == "ImageTemplate" then
+					imageLabel.ImageColor3 = Color3.fromRGB(85, 85, 85)
+				end
+				if imageLabel.Name == "Dead" then
+					imageLabel.Visible = true
+				end
+			end
+		end
 	end
 end
 
 function EnemyService:SpawnEnemy()
-	local killer = replicatedStorage:FindFirstChild("Killer"):Clone()
+	local killer = Killers:GetChildren()[math.random(1, #Killers:GetChildren())]:Clone()
+	killer:SetAttribute("State", "Spawned")
 	killer.Parent = workspace
 	killer.PrimaryPart:SetNetworkOwner(nil)
 	local totalHiddenPoints = #hiddenPoints:GetChildren()
@@ -116,10 +131,17 @@ function EnemyService:SpawnEnemy()
 
 		local targetPoint = randomPoint
 
+		killer:SetAttribute("State", "Walk")
 		moveToTarget(killer, targetPoint)
+		killer:SetAttribute("State", "Idle")
+		task.wait(1)
+		killer:SetAttribute("State", "Attack")
+		task.wait(1)
+		EnemyService:KillAllPlayersFromRoom(tonumber(randomPoint.Name))
+		killer:SetAttribute("State", "Idle")
+		task.wait(math.random(1, 3))
 
 		-- Mata todos os jogadores do comodo
-		EnemyService:KillAllPlayersFromRoom(tonumber(randomPoint.Name))
 	end
 	killer:Destroy()
 end
@@ -140,6 +162,10 @@ function EnemyService:StartKiller()
 		point.Color = Color3.fromRGB(0, 165, 5)
 		point.Parent = hiddenPoints
 	end
+	
+	-- Mostra os jogadores como escondidos
+	HouseService:ShowHiddenPlayers()
+	
 	self:SpawnEnemy()
 	self:ClearPoints()
 end

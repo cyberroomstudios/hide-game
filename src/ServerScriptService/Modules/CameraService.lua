@@ -24,6 +24,14 @@ function CameraService:SetAllVictimsToTopViewHouse()
 	end
 end
 
+function CameraService:SetAllPlayersToDoorView()
+	for _, player in Players:GetPlayers() do
+		bridge:Fire(player, {
+			[actionIdentifier] = "MoveToDoorView",
+		})
+	end
+end
+
 -- Define a visão de top View para todos as vitimas
 function CameraService:ResetAllPlayersInHouse()
 	for _, player in Players:GetPlayers() do

@@ -2,7 +2,7 @@
 -- Roblox Services
 -- ===========================================================================
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
+
 -- ===========================================================================
 -- Dependencies
 -- ===========================================================================
@@ -14,17 +14,12 @@ local Trove = require(Packages.Trove)
 -- Variables
 -- ===========================================================================
 
-local TweenInfoOpen = TweenInfo.new(
-    1, -- Tempo de duração
-    Enum.EasingStyle.Sine, -- Estilo de easing
-    Enum.EasingDirection.Out -- Direção do easing
-)
 
 -- ===========================================================================
 -- Components
 -- ===========================================================================
-local DoorComponent = Component.new({
-	Tag = "DoorComponent",
+local NPCComponent = Component.new({
+	Tag = "NPC",
 	Ancestors = {
 		workspace,
 	},
@@ -41,7 +36,43 @@ local DoorComponent = Component.new({
 -- ===========================================================================
 
 
+function NPCComponent:LoadAnimations()
+	local animator = self.Humanoid:FindFirstChildOfClass("Animator")
+	if not animator then
+		animator = Instance.new("Animator")
+		animator.Parent = self.Humanoid
+	end
+	local animFolder = self.Instance:FindFirstChild("Animations")
+	if not animFolder then
+		warn("No Animations folder found in Monster:", self.Instance.Name)
+		return
+	end
 
+	-- Carrega cada animação encontrada
+	for _, animObject in ipairs(animFolder:GetChildren()) do
+		if animObject:IsA("Animation") then
+			local track = animator:LoadAnimation(animObject)
+			self.AnimationTracks[animObject.Name] = track
+		end
+	end
+end
+
+function NPCComponent:PlayAnimation(stateName)
+	local track = self.AnimationTracks[stateName]
+
+	if not track then
+		return
+	end
+
+	-- Para a animação atual se existir
+	if self.CurrentAnimationTrack and self.CurrentAnimationTrack.IsPlaying then
+		self.CurrentAnimationTrack:Stop()
+	end
+
+	-- Toca a nova animação
+	track:Play()
+	self.CurrentAnimationTrack = track
+end
 
 
 -- ===========================================================================
@@ -51,50 +82,46 @@ local DoorComponent = Component.new({
     Construct is called before the component is started.
     It should be used to construct the component instance.
 ]]
-function DoorComponent:Construct()
+function NPCComponent:Construct()
 	self.Trove = Trove.new()
 	self.Trove:AttachToInstance(self.Instance)
 
+	self.Humanoid = self.Instance:FindFirstChildOfClass("Humanoid")
+
+	-- Animações
+	self.AnimationTracks = {}
+	self.CurrentAnimationTrack = nil
+
+	
 end
 
 --[[
     Start is called when the component is started.
     At this point in time, it is safe to grab other components also bound to the same instance.
 ]]
-function DoorComponent:Start()
-    print("Door Component Started")
+function NPCComponent:Start()
 	local instance = self.Instance
-    local hitbox = instance:FindFirstChild("Hitbox")
-    hitbox.Transparency = 1
-    local hinge = instance:FindFirstChild("Hinge")
-    local tween
-    local debounce = false
-    if hitbox then
-        self.Trove:Add(hitbox.Touched:Connect(function(otherPart)
-            local character = otherPart.Parent
-            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                if debounce then return end
-                debounce = true
-                tween = TweenService:Create(hinge, TweenInfoOpen, {CFrame = hinge.CFrame * CFrame.Angles(0, math.rad(90), 0)})
-                tween:Play()
-                tween.Completed:Wait()
-                task.wait(2) -- Tempo que a porta fica aberta
-                tween = TweenService:Create(hinge, TweenInfoOpen, {CFrame = hinge.CFrame * CFrame.Angles(0, math.rad(-90), 0)})
-                tween:Play()
-                tween.Completed:Wait()
-                debounce = false
-            end
-        end))
-    end
+
+
+
+	-- Carrega as animações
+	self:LoadAnimations()
+
+
+	self.Trove:Add(instance:GetAttributeChangedSignal("State"):Connect(function()
+		local state = instance:GetAttribute("State")
+		self:PlayAnimation(state)
+	end))
+	instance:SetAttribute("State", "Idle")
+	self:PlayAnimation("Idle")
 end
 
 --[[
     Stop is called when the component is stopped.
     This is called when the bound instance is removed from the whitelisted ancestors or when the tag is removed from the instance.
 ]]
-function DoorComponent:Stop()
+function NPCComponent:Stop()
 	self.Trove:Destroy()
 end
 
-return DoorComponent
+return NPCComponent

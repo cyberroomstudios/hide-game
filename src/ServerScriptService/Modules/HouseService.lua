@@ -48,26 +48,28 @@ function HouseService:GetRoomFromPlayer(player: Player)
 		return nil
 	end
 
-	local hrp = character:FindFirstChild("HumanoidRootPart")
-	if not hrp then
-		return nil
-	end
-
 	local floors = UtilService:WaitForDescendants(workspace, "Map", "House", "floors")
 
-	-- Ignora altura (Y)
-	local playerPos = Vector3.new(hrp.Position.X, 0, hrp.Position.Z)
+	-- Bounding box do personagem
+	local charCFrame, charSize = character:GetBoundingBox()
+	local charHalf = charSize / 2
 
 	for _, floor in floors:GetChildren() do
 		local roomNumber = floor:GetAttribute("ROOM_NUMBER")
-		if roomNumber then
-			local partPos = Vector3.new(floor.PrimaryPart.Position.X, 0, floor.PrimaryPart.Position.Z)
-			local halfSize = Vector3.new(floor.PrimaryPart.Size.X / 2, 0, floor.PrimaryPart.Size.Z / 2)
+		local root = floor.PrimaryPart
 
-			local isInside = math.abs(playerPos.X - partPos.X) <= halfSize.X
-				and math.abs(playerPos.Z - partPos.Z) <= halfSize.Z
+		if roomNumber and root then
+			local floorHalf = root.Size / 2
 
-			if isInside then
+			-- posição do character no espaço local da sala
+			local relative = root.CFrame:PointToObjectSpace(charCFrame.Position)
+
+			-- ignora Y (plano)
+			local intersects =
+				math.abs(relative.X) <= (floorHalf.X + charHalf.X) and
+				math.abs(relative.Z) <= (floorHalf.Z + charHalf.Z)
+
+			if intersects then
 				return roomNumber
 			end
 		end

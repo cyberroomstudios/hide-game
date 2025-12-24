@@ -10,6 +10,7 @@ local EnemyService = require(ServerScriptService.Modules.EnemyService)
 local HouseService = require(ServerScriptService.Modules.HouseService)
 local CameraService = require(ServerScriptService.Modules.CameraService)
 local BotService = require(ServerScriptService.Modules.BotService)
+local QueueOfKillerPaidService = require(ServerScriptService.Modules.QueueOfKillerPaidService)
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -48,7 +49,7 @@ end
 function GameLoopService:WaitInitGame()
 	workspace:SetAttribute("GAME_STEP", "WAIT_INIT_GAME")
 
-	for i = 5, 0, -1 do
+	for i = 15, 0, -1 do
 		workspace:SetAttribute("TIME_FOR_INIT_GAME", i)
 		task.wait(1)
 	end
@@ -62,17 +63,30 @@ function GameLoopService:DrawKiller()
 		player:SetAttribute("IS_KILLER", false)
 	end
 
-	if #players == 1 then
-		local isKiller = math.random(1, 2) == 1
-		players[1]:SetAttribute("IS_KILLER", false)
-	else
-		local killerIndex = math.random(1, #players)
-		local killerPlayer = players[killerIndex]
+	-- Pega o próximo jogador da fila
+	local nextKiller = QueueOfKillerPaidService:GetAndRemoveNext()
 
-		killerPlayer:SetAttribute("IS_KILLER", true)
+	local killerDefined = false
+
+	-- Usa a fila se for válida
+	if nextKiller and nextKiller:IsDescendantOf(Players) then
+		nextKiller:SetAttribute("IS_KILLER", true)
+		killerDefined = true
+		print("Comprado")
 	end
 
-	-- TODO Adicionar Lógica de sortear o matador
+	-- Se não conseguiu pela fila, sorteia
+	if not killerDefined then
+		if #players == 1 then
+			-- 1 jogador: pode ou não ser killer
+			local isKiller = math.random(1, 2) == 1
+			players[1]:SetAttribute("IS_KILLER", isKiller)
+		elseif #players > 1 then
+			local killerIndex = math.random(1, #players)
+			players[killerIndex]:SetAttribute("IS_KILLER", true)
+		end
+	end
+
 	workspace:SetAttribute("GAME_STEP", "DRAWING_THE_KILLER")
 
 	task.wait(5)

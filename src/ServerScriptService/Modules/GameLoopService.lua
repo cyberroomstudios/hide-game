@@ -9,6 +9,7 @@ local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefe
 local EnemyService = require(ServerScriptService.Modules.EnemyService)
 local HouseService = require(ServerScriptService.Modules.HouseService)
 local CameraService = require(ServerScriptService.Modules.CameraService)
+local BotService = require(ServerScriptService.Modules.BotService)
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -78,6 +79,10 @@ function GameLoopService:DrawKiller()
 end
 
 function GameLoopService:StartHideStep()
+	-- Cria todos os bots
+	BotService:SpawnInHouse(10)
+
+	-- Pega todo mundo pra dentro de casa
 	GameTeleportService:TeleportAllPlayersToHouse()
 	workspace:SetAttribute("GAME_STEP", "PLAYERS_HIDING")
 
@@ -88,7 +93,7 @@ function GameLoopService:StartHideStep()
 
 	-- Define o comodo de todos os jogadores
 	HouseService:SetRoomFromPlayers()
-	
+
 	-- Muda a Visão de todos os jogadores para a porta
 	CameraService:SetAllPlayersToDoorView()
 	task.wait(6)

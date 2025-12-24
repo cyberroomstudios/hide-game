@@ -1,6 +1,7 @@
 local RouletteController = {}
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
@@ -10,6 +11,12 @@ local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules
 
 local screen
 local listFrame
+local scrollingFrame
+local template
+local layout
+
+local victimTextLabel
+local killerTextLabel
 
 local SPINS = 4
 local ITEM_SCALE_Y = 0.25
@@ -20,7 +27,11 @@ end
 
 function RouletteController:CreateReferences()
 	screen = UIReferences:GetReference("ROULETTE_SCREEN")
-	listFrame = UIReferences:GetReference("ROULETTE_LIST_FRAME")
+	scrollingFrame = UIReferences:GetReference("SCROLLING_FRAME_ROULETTE")
+	template = scrollingFrame:WaitForChild("ItemTemplate")
+	layout = scrollingFrame:WaitForChild("UIListLayout")
+	victimTextLabel = screen.YouAreAVictim
+	killerTextLabel = screen.YouAreAKiller
 end
 
 function RouletteController:Open(data)
@@ -36,66 +47,101 @@ function RouletteController:GetScreen()
 	return screen
 end
 
-function RouletteController:Start()
-	local isKiller = player:GetAttribute("IS_KILLER") == true
-	local FINAL_TEXT = isKiller and "Killer" or "Victim"
+local ITEMS = { "Victim", "Killer" }
+local REPEAT_COUNT = 25
+local SPIN_TIME = 2.5
 
-	listFrame:ClearAllChildren()
-	listFrame.Position = UDim2.fromScale(0, 0)
-
-	local items = { "Victim", "Killer" }
-	local totalItems = #items * SPINS
-
-	for i = 1, totalItems do
-		local index = ((i - 1) % #items) + 1
-		local text = items[index]
-
-		-- FORÇA O ÚLTIMO ITEM A SER O RESULTADO
-		if i == totalItems then
-			text = FINAL_TEXT
+local function clearAll()
+	for _, v in scrollingFrame:GetChildren() do
+		if v:IsA("TextLabel") and v ~= template then
+			v:Destroy()
 		end
+	end
+end
 
-		local label = Instance.new("TextLabel")
-		label.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
-		label.Size = UDim2.fromScale(1, ITEM_SCALE_Y)
-		label.Position = UDim2.fromScale(0, (i - 1) * ITEM_SCALE_Y)
-		label.BackgroundTransparency = 1
-		label.TextScaled = true
-		label.Text = text
-		label.Parent = listFrame
+local function createItem(text)
+	local label = template:Clone()
+	label.Visible = true
+	label.Text = text
+	label.Parent = scrollingFrame
+	return label
+end
+
+local function showFinalResult(resultText)
+	clearAll()
+
+	scrollingFrame.CanvasPosition = Vector2.zero
+	scrollingFrame.ScrollingEnabled = false
+
+	local label = createItem(resultText)
+
+	-- Centraliza visualmente
+	label.TextColor3 = Color3.new(85 / 255, 255 / 255, 0 / 255)
+	label.AnchorPoint = Vector2.new(0.5, 0.5)
+	label.Position = UDim2.fromScale(0.5, 0.5)
+	label.Size = UDim2.fromScale(0.9, 0.6)
+end
+
+local function spin(finalResult)
+	scrollingFrame.Visible = true
+	victimTextLabel.Visible = false
+	killerTextLabel.Visible = false
+
+	scrollingFrame.ScrollingEnabled = true
+	clearAll()
+
+	local finalLabel
+
+	for i = 1, REPEAT_COUNT do
+		createItem(ITEMS[math.random(#ITEMS)])
 	end
 
-	-- altura total da lista
-	listFrame.Size = UDim2.fromScale(1, totalItems * ITEM_SCALE_Y)
+	finalLabel = createItem(finalResult)
 
-	-- PARA SEMPRE NO ÚLTIMO ITEM
-	local stopScaleY = -((totalItems - 1) * ITEM_SCALE_Y)
+	RunService.Heartbeat:Wait()
+	RunService.Heartbeat:Wait()
+
+	scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
+
+	scrollingFrame.CanvasPosition = Vector2.zero
+
+	local windowCenter = scrollingFrame.AbsoluteWindowSize.Y / 2
+	local labelCenter = finalLabel.AbsolutePosition.Y
+		- scrollingFrame.AbsolutePosition.Y
+		+ finalLabel.AbsoluteSize.Y / 2
+
+	local targetY = labelCenter - windowCenter
 
 	local tween = TweenService:Create(
-		listFrame,
-		TweenInfo.new(2.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-		{ Position = UDim2.fromScale(0, stopScaleY) }
+		scrollingFrame,
+		TweenInfo.new(SPIN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+		{ CanvasPosition = Vector2.new(0, targetY) }
 	)
 
 	tween:Play()
 
 	tween.Completed:Once(function()
-		listFrame:ClearAllChildren()
-		listFrame.Size = UDim2.fromScale(1, 1)
-		listFrame.Position = UDim2.fromScale(0, 0)
-
-		local finalLabel = Instance.new("TextLabel")
-		finalLabel.FontFace = Font.new("rbxasset://fonts/families/AccanthisADFStd.json")
-		finalLabel.Size = UDim2.fromScale(1, 1)
-		finalLabel.BackgroundTransparency = 1
-		finalLabel.TextScaled = true
-		finalLabel.Text = FINAL_TEXT
-		finalLabel.Parent = listFrame
-
-		if isKiller then
+		scrollingFrame.Visible = false
+		if finalResult == "killer" then
+			killerTextLabel.Visible = true
+			task.wait(2)
 			CameraController:MoveToHouse()
+			killerTextLabel.Visible = false
+		end
+
+		if finalResult == "Victim" then
+			victimTextLabel.Visible = true
+			task.wait(2)
+		victimTextLabel.Visible = false
 		end
 	end)
+end
+
+function RouletteController:Start()
+	local isKiller = player:GetAttribute("IS_KILLER") == true
+	local finalResult = isKiller and "Killer" or "Victim"
+
+	spin(finalResult)
 end
 
 return RouletteController

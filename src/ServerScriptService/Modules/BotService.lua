@@ -34,7 +34,7 @@ local function setNpcCollisionGroup(npcModel)
 	local function apply(part)
 		if part:IsA("BasePart") then
 			part.CanCollide = true
-			PhysicsService:SetPartCollisionGroup(part, "NPC")
+			part.CollisionGroup = "NPC"
 		end
 	end
 

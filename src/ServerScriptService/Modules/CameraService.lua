@@ -43,6 +43,19 @@ function CameraService:SetAllPlayersToDoorView()
 	end
 end
 
+function CameraService:SetAllPlayerToRoomView(roomNumber: number)
+	for _, player in Players:GetPlayers() do
+		if player:GetAttribute("IN_HOUSE") then
+			bridge:Fire(player, {
+				[actionIdentifier] = "MoveToRoomView",
+				data = { 
+					RoomNumber = roomNumber, 
+				}
+			})
+		end
+	end
+end
+
 -- Define a visão de top View para todos as vitimas
 function CameraService:ResetAllPlayersInHouse()
 	for _, player in Players:GetPlayers() do

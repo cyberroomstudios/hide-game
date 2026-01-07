@@ -31,6 +31,9 @@ function CameraController:InitBridgeListener()
 		if response[actionIdentifier] == "Reset" then
 			CameraController:Reset()
 		end
+		if response[actionIdentifier] == "MoveToRoomView" then
+			CameraController:MoveToRoomView(response.data.RoomNumber)
+		end
 	end)
 end
 
@@ -70,6 +73,13 @@ function CameraController:UnlockMovement()
 	humanoid.WalkSpeed = 16
 	humanoid.JumpPower = 50
 	humanoid.AutoRotate = true
+end
+
+function CameraController:MoveToRoomView(roomNumber)
+	CameraController:LockMovement()
+	local cameraAttachment = ClientUtil:WaitForDescendants(workspace, "Cutscenes", "Cameras", roomNumber)
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CFrame = cameraAttachment.CFrame
 end
 
 return CameraController

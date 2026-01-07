@@ -20,6 +20,7 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- End Bridg Net
 
 local HouseService = require(ServerScriptService.Modules.HouseService)
+local CameraService = require(ServerScriptService.Modules.CameraService)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 local GamePathFindingService = require(ServerScriptService.Modules.GamePathFindingService)
 
@@ -72,10 +73,17 @@ function EnemyService:SpawnEnemy()
 
 		killer:SetAttribute("State", "Walk")
 		GamePathFindingService:MoveToTarget(killer, targetPoint)
-		killer:SetAttribute("State", "Idle")
-		task.wait(1)
-		killer:SetAttribute("State", "Attack")
-		task.wait(1)
+		
+		CameraService:SetAllPlayerToRoomView(targetPoint.Name)
+		print("Killer moved to room: " .. targetPoint.Name)
+		task.wait(5)
+		print("Killer reached the room: " .. targetPoint.Name)
+		CameraService:SetAllVictimsToTopViewHouse()
+
+		--killer:SetAttribute("State", "Idle")
+		--task.wait(1)
+		--killer:SetAttribute("State", "Attack")
+		--task.wait(1)
 		EnemyService:KillAllPlayersFromRoom(tonumber(randomPoint.Name))
 		killer:SetAttribute("State", "Idle")
 		task.wait(math.random(1, 3))

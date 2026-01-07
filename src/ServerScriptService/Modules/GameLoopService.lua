@@ -10,7 +10,7 @@ local EnemyService = require(ServerScriptService.Modules.EnemyService)
 local HouseService = require(ServerScriptService.Modules.HouseService)
 local CameraService = require(ServerScriptService.Modules.CameraService)
 local BotService = require(ServerScriptService.Modules.BotService)
-local QueueOfKillerPaidService = require(ServerScriptService.Modules.QueueOfKillerPaidService)
+local KillerChanceService = require(ServerScriptService.Modules.KillerChanceService)
 
 function GameLoopService:Init()
 	GameLoopService:Start()
@@ -58,43 +58,37 @@ end
 function GameLoopService:DrawKiller()
 	local players = Players:GetPlayers()
 
-	-- Limpa o atributo de todos
-	for _, player in ipairs(players) do
+	-- Limpa todos os Jogadores
+	for _, player in players do
 		player:SetAttribute("IS_KILLER", false)
 	end
 
-	-- Pega o próximo jogador da fila
-	local nextKiller = QueueOfKillerPaidService:GetAndRemoveNext()
+	local killer = KillerChanceService:DrawPlayerByChance()
 
-	local killerDefined = false
-
-	-- Usa a fila se for válida
-	if nextKiller and nextKiller:IsDescendantOf(Players) then
-		nextKiller:SetAttribute("IS_KILLER", true)
-		killerDefined = true
-		print("Comprado")
+	-- Define o Killer e reseta a chance dele pra próxima rodada
+	if killer then
+		killer:SetAttribute("IS_KILLER", true)
+		KillerChanceService:ResetChance(killer)
 	end
 
-	-- Se não conseguiu pela fila, sorteia
-	if not killerDefined then
-		if #players == 1 then
-			-- 1 jogador: pode ou não ser killer
-			local isKiller = math.random(1, 2) == 1
-			players[1]:SetAttribute("IS_KILLER", isKiller)
-		elseif #players > 1 then
-			local killerIndex = math.random(1, #players)
-			players[killerIndex]:SetAttribute("IS_KILLER", true)
+	-- Incrementa a chance dos demais jogadores
+	for _, player in players do
+		if killer and killer == player then
+			continue
 		end
+		KillerChanceService:IncrementChance(player)
 	end
-
-	workspace:SetAttribute("GAME_STEP", "DRAWING_THE_KILLER")
-
-	task.wait(5)
 end
 
 function GameLoopService:StartHideStep()
 	-- Cria todos os bots
 	BotService:SpawnInHouse(10)
+
+	-- Muda a Visão do Killer para cima da casa
+	--CameraService:SetKillerView()
+
+	-- Teleporta o Killer para o Spawn Killer
+	--GameTeleportService:TeleportKillerToSpawn()
 
 	-- Pega todo mundo pra dentro de casa
 	GameTeleportService:TeleportAllPlayersToHouse()
@@ -107,10 +101,6 @@ function GameLoopService:StartHideStep()
 
 	-- Define o comodo de todos os jogadores
 	HouseService:SetRoomFromPlayers()
-
-	-- Muda a Visão de todos os jogadores para a porta
-	CameraService:SetAllPlayersToDoorView()
-	task.wait(6)
 
 	-- Muda a Visão de todos as vitimas
 	CameraService:SetAllVictimsToTopViewHouse()

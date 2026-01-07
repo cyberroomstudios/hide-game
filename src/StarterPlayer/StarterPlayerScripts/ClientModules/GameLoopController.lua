@@ -4,6 +4,8 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
+local HudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.HudController)
+local KillerHudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerHudController)
 
 local labels = {}
 local screens = {}
@@ -65,6 +67,12 @@ function GameLoopController:OpenLabel(labelName: string)
 	labels[labelName].Visible = true
 end
 
+function GameLoopController:CloseAllLabels()
+	for _, value in labels do
+		value.Visible = false
+	end
+end
+
 function GameLoopController:ShowWaitInitGame()
 	GameLoopController:OpenLabel("WAIT_START_GAME")
 	task.spawn(function()
@@ -106,19 +114,30 @@ function GameLoopController:VerifyGameStep()
 	local gameStep = workspace:GetAttribute("GAME_STEP")
 
 	if gameStep == "WAIT_INIT_GAME" then
+		HudController:ShowDefaultHud()
+
 		GameLoopController:ShowWaitInitGame()
 	end
 
 	if gameStep == "DRAWING_THE_KILLER" then
+		HudController:HideDefaultHud()
 		GameLoopController:Open("ROULETTE")
 	end
 
 	if gameStep == "PLAYERS_HIDING" then
+		HudController:HideDefaultHud()
 		GameLoopController:ShowHideMessage()
 	end
 
 	if gameStep == "KILLER_IN_PROGRESS" then
-		GameLoopController:ShowKillerInProgressMessage()
+		HudController:HideDefaultHud()
+
+		if player:GetAttribute("IS_KILLER") then
+			GameLoopController:CloseAllLabels()
+			KillerHudController:Open()
+		else
+			GameLoopController:ShowKillerInProgressMessage()
+		end
 	end
 end
 

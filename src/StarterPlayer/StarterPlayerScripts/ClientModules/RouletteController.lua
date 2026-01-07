@@ -6,7 +6,6 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
-local KillerHudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerHudController)
 local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules.CameraController)
 
 local screen
@@ -122,7 +121,7 @@ local function spin(finalResult)
 
 	tween.Completed:Once(function()
 		scrollingFrame.Visible = false
-		if finalResult == "killer" then
+		if finalResult == "Killer" then
 			killerTextLabel.Visible = true
 			task.wait(2)
 			CameraController:MoveToHouse()
@@ -132,7 +131,7 @@ local function spin(finalResult)
 		if finalResult == "Victim" then
 			victimTextLabel.Visible = true
 			task.wait(2)
-		victimTextLabel.Visible = false
+			victimTextLabel.Visible = false
 		end
 	end)
 end

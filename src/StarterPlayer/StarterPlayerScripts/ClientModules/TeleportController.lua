@@ -25,6 +25,10 @@ function TeleportController:InitBridgeListener()
 		if response[actionIdentifier] == "TeleportToLobby" then
 			TeleportController:ToLobbySpawn()
 		end
+
+		if response[actionIdentifier] == "TeleporToKillerSpawn" then
+			TeleportController:ToKillerSpawn()
+		end
 	end)
 end
 
@@ -43,6 +47,16 @@ function TeleportController:ToStartGame()
 	local character = player.Character
 	if lobbySpawnCFrame and character and character:FindFirstChild("HumanoidRootPart") then
 		character.HumanoidRootPart.CFrame = lobbySpawnCFrame
+	end
+end
+
+-- Leva um jogador para oo lugar em que o Killer fica aguardando
+function TeleportController:ToKillerSpawn()
+	local killerSpawnCFrame = player:GetAttribute("KILLER_SPAWN")
+
+	local character = player.Character
+	if killerSpawnCFrame and character and character:FindFirstChild("HumanoidRootPart") then
+		character.HumanoidRootPart.CFrame = killerSpawnCFrame
 	end
 end
 

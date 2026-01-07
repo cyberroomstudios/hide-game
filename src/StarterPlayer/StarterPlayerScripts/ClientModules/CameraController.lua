@@ -28,7 +28,7 @@ function CameraController:InitBridgeListener()
 			CameraController:MoveToDoorView()
 		end
 
-        if response[actionIdentifier] == "Reset" then
+		if response[actionIdentifier] == "Reset" then
 			CameraController:Reset()
 		end
 	end)
@@ -42,13 +42,13 @@ end
 
 -- Leva a camera do jogador para a visão de cima da casa
 function CameraController:MoveToHouse()
+	print("Movendo")
 	CameraController:LockMovement()
 	local cameraAttachment = ClientUtil:WaitForDescendants(workspace, "Map", "Cameras", "HouseTopView")
 	camera.CameraType = Enum.CameraType.Scriptable
 	camera.CFrame = cameraAttachment.WorldCFrame
 end
 
--- Leva a camera do jogador para a visão de cima da casa
 function CameraController:MoveToDoorView()
 	CameraController:LockMovement()
 	local cameraAttachment = ClientUtil:WaitForDescendants(workspace, "Map", "Cameras", "DoorFrontView")

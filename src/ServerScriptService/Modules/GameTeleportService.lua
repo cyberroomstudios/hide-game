@@ -24,10 +24,22 @@ function GameTeleportService:TeleportAllPlayersToHouse()
 	end
 end
 
+-- Teleporta o Killer para O Spawn
+function GameTeleportService:TeleportKillerToSpawn()
+	for _, player in Players:GetPlayers() do
+		if player:GetAttribute("IS_KILLER") then
+			player:SetAttribute("IN_HOUSE", true)
+			bridge:Fire(player, {
+				[actionIdentifier] = "TeleporToKillerSpawn",
+			})
+		end
+	end
+end
+
 function GameTeleportService:TeleportToLobby(player: Player)
 	player:SetAttribute("IN_HOUSE", false)
 	bridge:Fire(player, {
-		[actionIdentifier] = "TeleportToLobby",
+		[actionIdentifier] = "",
 	})
 end
 

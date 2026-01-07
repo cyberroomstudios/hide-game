@@ -13,6 +13,17 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 
 function CameraService:Init() end
 
+-- Define a visão do Killer
+function CameraService:SetKillerView()
+	for _, player in Players:GetPlayers() do
+		if player:GetAttribute("IS_KILLER") then
+			bridge:Fire(player, {
+				[actionIdentifier] = "MoveToHouse",
+			})
+		end
+	end
+end
+
 -- Define a visão de top View para todos as vitimas
 function CameraService:SetAllVictimsToTopViewHouse()
 	for _, player in Players:GetPlayers() do

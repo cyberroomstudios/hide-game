@@ -14,6 +14,8 @@ local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
 local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 -- End Bridg Net
 
+local KillerChanceService = require(ServerScriptService.Modules.KillerChanceService)
+
 local playerInitializer = {}
 
 function StartGameService:Init()
@@ -32,6 +34,7 @@ function StartGameService:InitBridgeListener()
 				return false
 			end
 			StartGameService:InitPlayerAttributes(player)
+			KillerChanceService:StartInitialChance(player)
 			print("Init")
 		end
 	end
@@ -41,8 +44,11 @@ function StartGameService:InitPlayerAttributes(player: Player)
 	local lobbySpawn = UtilService:WaitForDescendants(workspace, "Map", "Lobby", "Spawn")
 	player:SetAttribute("LOBBY_SPAWN", lobbySpawn.CFrame)
 
-		local lobbyStartGame = UtilService:WaitForDescendants(workspace, "Map", "House", "Spawn")
+	local lobbyStartGame = UtilService:WaitForDescendants(workspace, "Map", "House", "Spawn")
 	player:SetAttribute("START_GAME_SPAWN", lobbyStartGame.CFrame)
+
+	local killerSpawn = UtilService:WaitForDescendants(workspace, "Map", "KillerSpawn", "Spawn")
+	player:SetAttribute("KILLER_SPAWN", killerSpawn.CFrame)
 end
 
 return StartGameService

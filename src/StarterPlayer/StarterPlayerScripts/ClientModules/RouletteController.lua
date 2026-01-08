@@ -1,146 +1,189 @@
 local RouletteController = {}
 
+-- =========================
+-- SERVICES
+-- =========================
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+
 local player = Players.LocalPlayer
 
+-- =========================
+-- DEPENDÊNCIAS
+-- =========================
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
 local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules.CameraController)
 
-local screen
+-- =========================
+-- REFERÊNCIAS UI
+-- =========================
+local rouletteFrame
+local viewport
 local listFrame
-local scrollingFrame
-local template
 local layout
 
-local victimTextLabel
-local killerTextLabel
+-- =========================
+-- CONFIGURAÇÕES
+-- =========================
+local LOOP_COUNT = 10
+local START_DELAY = 0.03
+local END_DELAY = 0.15
+local EASING_STYLE = Enum.EasingStyle.Linear
 
-local SPINS = 4
-local ITEM_SCALE_Y = 0.25
+-- =========================
+-- ESTADO INTERNO
+-- =========================
+local originalItems = {}
+local ITEM_COUNT = 0
+local TOTAL_ITEMS = 0
+local ITEM_HEIGHT_PX = 0
+local VIEWPORT_HEIGHT_PX = 0
+local spinning = false
 
+-- =========================
+-- INIT
+-- =========================
 function RouletteController:Init()
-	RouletteController:CreateReferences()
+	self:CreateReferences()
+	self:Configure()
 end
 
 function RouletteController:CreateReferences()
-	screen = UIReferences:GetReference("ROULETTE_SCREEN")
-	scrollingFrame = UIReferences:GetReference("SCROLLING_FRAME_ROULETTE")
-	template = scrollingFrame:WaitForChild("ItemTemplate")
-	layout = scrollingFrame:WaitForChild("UIListLayout")
-	victimTextLabel = screen.YouAreAVictim
-	killerTextLabel = screen.YouAreAKiller
+	rouletteFrame = UIReferences:GetReference("ROULETTE_SCREEN")
+	viewport = UIReferences:GetReference("ROULETTE_VIEWPORT")
+	listFrame = UIReferences:GetReference("ROULETTE_UI_LIST_FRAME")
+	layout = UIReferences:GetReference("ROULETTE_UI_LIST_LAYOUT")
 end
 
-function RouletteController:Open(data)
-	screen.Visible = true
-	RouletteController:Start()
-end
+-- =========================
+-- CONFIGURAÇÃO INICIAL
+-- =========================
+function RouletteController:Configure()
+	originalItems = {}
 
-function RouletteController:Close()
-	screen.Visible = false
-end
-
-function RouletteController:GetScreen()
-	return screen
-end
-
-local ITEMS = { "Victim", "Killer" }
-local REPEAT_COUNT = 25
-local SPIN_TIME = 2.5
-
-local function clearAll()
-	for _, v in scrollingFrame:GetChildren() do
-		if v:IsA("TextLabel") and v ~= template then
-			v:Destroy()
+	for _, child in ipairs(listFrame:GetChildren()) do
+		if child:IsA("TextLabel") then
+			table.insert(originalItems, child)
 		end
 	end
-end
 
-local function createItem(text)
-	local label = template:Clone()
-	label.Visible = true
-	label.Text = text
-	label.Parent = scrollingFrame
-	return label
-end
+	table.sort(originalItems, function(a, b)
+		return a.LayoutOrder < b.LayoutOrder
+	end)
 
-local function showFinalResult(resultText)
-	clearAll()
-
-	scrollingFrame.CanvasPosition = Vector2.zero
-	scrollingFrame.ScrollingEnabled = false
-
-	local label = createItem(resultText)
-
-	-- Centraliza visualmente
-	label.TextColor3 = Color3.new(85 / 255, 255 / 255, 0 / 255)
-	label.AnchorPoint = Vector2.new(0.5, 0.5)
-	label.Position = UDim2.fromScale(0.5, 0.5)
-	label.Size = UDim2.fromScale(0.9, 0.6)
-end
-
-local function spin(finalResult)
-	scrollingFrame.Visible = true
-	victimTextLabel.Visible = false
-	killerTextLabel.Visible = false
-
-	scrollingFrame.ScrollingEnabled = true
-	clearAll()
-
-	local finalLabel
-
-	for i = 1, REPEAT_COUNT do
-		createItem(ITEMS[math.random(#ITEMS)])
+	ITEM_COUNT = #originalItems
+	if ITEM_COUNT == 0 then
+		warn("RouletteController: nenhum item encontrado")
+		return
 	end
 
-	finalLabel = createItem(finalResult)
+	-- Aguarda layout calcular
+	task.wait()
+	task.wait()
 
-	RunService.Heartbeat:Wait()
-	RunService.Heartbeat:Wait()
+	ITEM_HEIGHT_PX = layout.AbsoluteContentSize.Y / ITEM_COUNT
+	VIEWPORT_HEIGHT_PX = viewport.AbsoluteSize.Y
 
-	scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
+	-- Loop fake (duplica itens)
+	for i = 1, LOOP_COUNT - 1 do
+		for _, item in ipairs(originalItems) do
+			local clone = item:Clone()
+			clone.LayoutOrder = item.LayoutOrder + (i * ITEM_COUNT)
+			clone.Parent = listFrame
+		end
+	end
 
-	scrollingFrame.CanvasPosition = Vector2.zero
+	task.wait()
+	task.wait()
 
-	local windowCenter = scrollingFrame.AbsoluteWindowSize.Y / 2
-	local labelCenter = finalLabel.AbsolutePosition.Y
-		- scrollingFrame.AbsolutePosition.Y
-		+ finalLabel.AbsoluteSize.Y / 2
+	TOTAL_ITEMS = ITEM_COUNT * LOOP_COUNT
+end
 
-	local targetY = labelCenter - windowCenter
+-- =========================
+-- TWEEN POR ÍNDICE
+-- =========================
+local function tweenToIndex(index, duration)
+	local yPx = -(index - 1) * ITEM_HEIGHT_PX
+	local yScale = yPx / VIEWPORT_HEIGHT_PX
 
 	local tween = TweenService:Create(
-		scrollingFrame,
-		TweenInfo.new(SPIN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-		{ CanvasPosition = Vector2.new(0, targetY) }
+		listFrame,
+		TweenInfo.new(duration, EASING_STYLE),
+		{ Position = UDim2.fromScale(0, yScale) }
 	)
 
 	tween:Play()
-
-	tween.Completed:Once(function()
-		scrollingFrame.Visible = false
-		if finalResult == "Killer" then
-			killerTextLabel.Visible = true
-			task.wait(2)
-			CameraController:MoveToHouse()
-			killerTextLabel.Visible = false
-		end
-
-		if finalResult == "Victim" then
-			victimTextLabel.Visible = true
-			task.wait(2)
-			victimTextLabel.Visible = false
-		end
-	end)
+	tween.Completed:Wait()
 end
 
+-- =========================
+-- BUSCA ÍNDICE PELO TEXTO
+-- =========================
+local function getIndexByText(text)
+	for i, item in ipairs(originalItems) do
+		if item.Text == text then
+			return i
+		end
+	end
+	return nil
+end
+
+-- =========================
+-- SPIN (PARA ÍNDICE FINAL)
+-- =========================
+function RouletteController:Spin(finalIndex)
+	if spinning then
+		return
+	end
+	spinning = true
+
+	listFrame.Position = UDim2.fromScale(0, 0)
+
+	-- várias voltas antes de parar
+	local baseSteps = TOTAL_ITEMS - ITEM_COUNT
+	local targetStep = baseSteps + finalIndex
+
+	local delayStep = (END_DELAY - START_DELAY) / targetStep
+	local currentDelay = START_DELAY
+
+	for i = 1, targetStep do
+		tweenToIndex(i, currentDelay)
+		currentDelay += delayStep
+	end
+
+	spinning = false
+end
+
+-- =========================
+-- CONTROLE DE TELA
+-- =========================
+function RouletteController:Open()
+	rouletteFrame.Visible = true
+	self:Start()
+end
+
+function RouletteController:Close()
+	rouletteFrame.Visible = false
+end
+
+function RouletteController:GetScreen()
+	return rouletteFrame
+end
+
+-- =========================
+-- START
+-- =========================
 function RouletteController:Start()
 	local isKiller = player:GetAttribute("IS_KILLER") == true
-	local finalResult = isKiller and "Killer" or "Victim"
+	local finalResult = isKiller and "KILLER" or "VICTIM"
 
-	spin(finalResult)
+	local finalIndex = getIndexByText(finalResult)
+	if not finalIndex then
+		warn("Resultado não encontrado na roleta:", finalResult)
+		return
+	end
+
+	self:Spin(finalIndex)
 end
 
 return RouletteController

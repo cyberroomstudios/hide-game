@@ -78,6 +78,9 @@ function GameLoopService:DrawKiller()
 		end
 		KillerChanceService:IncrementChance(player)
 	end
+
+	workspace:SetAttribute("GAME_STEP", "DRAWING_THE_KILLER")
+	task.wait(7)
 end
 
 function GameLoopService:StartHideStep()

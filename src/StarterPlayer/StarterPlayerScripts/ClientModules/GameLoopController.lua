@@ -120,12 +120,10 @@ function GameLoopController:VerifyGameStep()
 	end
 
 	if gameStep == "DRAWING_THE_KILLER" then
-		HudController:HideDefaultHud()
 		GameLoopController:Open("ROULETTE")
 	end
 
 	if gameStep == "PLAYERS_HIDING" then
-		HudController:HideDefaultHud()
 		GameLoopController:ShowHideMessage()
 	end
 

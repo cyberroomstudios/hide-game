@@ -17,6 +17,7 @@ local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules
 -- =========================
 -- REFERÊNCIAS UI
 -- =========================
+local screen
 local rouletteFrame
 local viewport
 local listFrame
@@ -49,6 +50,7 @@ function RouletteController:Init()
 end
 
 function RouletteController:CreateReferences()
+	screen = UIReferences:GetReference("ROULETTE_MAIN_SCREEN")
 	rouletteFrame = UIReferences:GetReference("ROULETTE_SCREEN")
 	viewport = UIReferences:GetReference("ROULETTE_VIEWPORT")
 	listFrame = UIReferences:GetReference("ROULETTE_UI_LIST_FRAME")
@@ -106,11 +108,8 @@ local function tweenToIndex(index, duration)
 	local yPx = -(index - 1) * ITEM_HEIGHT_PX
 	local yScale = yPx / VIEWPORT_HEIGHT_PX
 
-	local tween = TweenService:Create(
-		listFrame,
-		TweenInfo.new(duration, EASING_STYLE),
-		{ Position = UDim2.fromScale(0, yScale) }
-	)
+	local tween =
+		TweenService:Create(listFrame, TweenInfo.new(duration, EASING_STYLE), { Position = UDim2.fromScale(0, yScale) })
 
 	tween:Play()
 	tween.Completed:Wait()
@@ -158,16 +157,16 @@ end
 -- CONTROLE DE TELA
 -- =========================
 function RouletteController:Open()
-	rouletteFrame.Visible = true
+	screen.Visible = true
 	self:Start()
 end
 
 function RouletteController:Close()
-	rouletteFrame.Visible = false
+	screen.Visible = false
 end
 
 function RouletteController:GetScreen()
-	return rouletteFrame
+	return screen
 end
 
 -- =========================

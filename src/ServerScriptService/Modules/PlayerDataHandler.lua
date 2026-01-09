@@ -33,6 +33,11 @@ local dataTemplate = {
 	totalNumberOfPlayersMurdered = 0, -- Quantidade total de jogadores que o jogador como killer conseguiu matar
 	victimMurdered = 0, -- Quantidade total de vezes que o jogador como vitima foi assassinado
 	hasToBeKillerGamepass = false, -- Indica se o jogador comprou o gamepass
+	money = 0,
+	config = {
+		soundEffect = false,
+		music = false,
+	}
 }
 
 local ProfileService = require(ServerScriptService.libs.ProfileService)

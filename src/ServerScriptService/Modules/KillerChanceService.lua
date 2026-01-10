@@ -68,4 +68,13 @@ function KillerChanceService:DrawPlayerByChance()
 
 	return nil
 end
+
+function KillerChanceService:DrawPlayerByChanceFake()
+	local players = Players:GetPlayers()
+
+	for _, player in players do
+		return player
+	end
+end
+
 return KillerChanceService

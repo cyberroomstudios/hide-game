@@ -63,7 +63,7 @@ function GameLoopService:DrawKiller()
 		player:SetAttribute("IS_KILLER", false)
 	end
 
-	local killer = KillerChanceService:DrawPlayerByChance()
+	local killer = KillerChanceService:DrawPlayerByChanceFake()
 
 	-- Define o Killer e reseta a chance dele pra próxima rodada
 	if killer then

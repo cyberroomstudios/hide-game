@@ -14,6 +14,7 @@ local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 local TeleportController = require(Players.LocalPlayer.PlayerScripts.ClientModules.TeleportController)
 local GameLoopController = require(Players.LocalPlayer.PlayerScripts.ClientModules.GameLoopController)
 local KillerChanceController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerChanceController)
+local HouseController = require(Players.LocalPlayer.PlayerScripts.ClientModules.HouseController)
 
 local player = Players.LocalPlayer
 
@@ -24,6 +25,7 @@ function StartGameController:Init(data)
 	})
 
 	KillerChanceController:SetInitialChance()
+	HouseController:Configure()
 	TeleportController:ToLobbySpawn()
 	GameLoopController:VerifyGameStep()
 end

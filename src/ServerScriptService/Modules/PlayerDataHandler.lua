@@ -11,6 +11,8 @@ local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
 local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
 
 local ServerScriptService = game:GetService("ServerScriptService")
+local Replion = require(ReplicatedStorage.Packages.Replion)
+local ReplionServer = Replion.Server
 
 local bridgePlayer = BridgeNet2.ReferenceBridge("Player")
 
@@ -72,6 +74,12 @@ local function playerAdded(player)
 			[statusIdentifier] = "success",
 			[messageIdentifier] = "Player data loaded",
 			data = profile.Data,
+		})
+
+		ReplionServer.new({
+			Channel = "PlayerData",
+			ReplicateTo = player,
+			Data = profile.Data,
 		})
 	else
 		player:Kick()

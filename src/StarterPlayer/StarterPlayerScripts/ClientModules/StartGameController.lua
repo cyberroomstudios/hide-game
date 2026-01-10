@@ -25,7 +25,7 @@ function StartGameController:Init(data)
 	})
 
 	KillerChanceController:SetInitialChance()
-	HouseController:Configure()
+
 	TeleportController:ToLobbySpawn()
 	GameLoopController:VerifyGameStep()
 end

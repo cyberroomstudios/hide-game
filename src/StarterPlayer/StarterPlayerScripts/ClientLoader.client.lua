@@ -28,3 +28,19 @@ bridge:Connect(function(response)
 		end
 	end
 end)
+
+local Loader = require(Utility.Loader)
+
+
+local Content = {
+	{ "Component", ReplicatedStorage.Components, "AfterKnit" },
+}
+
+
+
+while not workspace:GetAttribute("ServerLoaded") do
+	task.wait()
+end
+
+local Middleware = {}
+Loader(Content, Middleware)

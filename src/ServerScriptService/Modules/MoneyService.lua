@@ -1,24 +1,42 @@
 local MoneyService = {}
-local ServerScriptService = game:GetService("ServerScriptService")
-local PlayerDataHandler = require(ServerScriptService.Modules.PlayerDataHandler)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Packages = ReplicatedStorage.Packages
+local Replion = require(Packages.Replion)
+local ReplionServer = Replion.Server
+
 
 function MoneyService:Init()
     
 end
 
 function MoneyService:GiveMoney(player: Player, amount : number)
-    -- TODO EXEMPLOS
-    
-    -- Obtem um valor do banco
-    local money = PlayerDataHandler:Get(player, "money")
+    local PlayerData = ReplionServer:WaitReplionFor(player, "PlayerData", 10)
+    if PlayerData then
+        PlayerData:Increase("money", amount)
+    end
+end
 
-    -- Atualiza um valor no banco
-    PlayerDataHandler:Update(player, "money", function(current)
-        return current + amount
-    end)
+function MoneyService:TakeMoney(player: Player, amount : number)
+    local PlayerData = ReplionServer:WaitReplionFor(player, "PlayerData", 10)
+    if PlayerData then
+        PlayerData:Increase("money", -amount)
+    end
+end
 
-    -- Sobreescreve um valor no banco
-    PlayerDataHandler:Set(player, "money", 0)
+function MoneyService:SetMoney(player: Player, amount : number)
+    local PlayerData = ReplionServer:WaitReplionFor(player, "PlayerData", 10)
+    if PlayerData then
+        PlayerData:Set("money", amount)
+    end
+end
+
+function MoneyService:GetMoney(player: Player) : number?
+    local PlayerData = ReplionServer:WaitReplionFor(player, "PlayerData", 10)
+    if PlayerData then
+        return PlayerData:Get("money")
+    end
+    return nil
 end
 
 return MoneyService

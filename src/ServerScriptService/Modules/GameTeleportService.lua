@@ -16,24 +16,29 @@ function GameTeleportService:Init() end
 function GameTeleportService:TeleportAllPlayersToHouse()
 	for _, player in Players:GetPlayers() do
 		player:SetAttribute("IN_HOUSE", true)
-		pcall(function()
-			bridge:Fire(player, {
-				[actionIdentifier] = "TeleportToHouse",
-			})
-		end)
+
+		if player:GetAttribute("IS_KILLER") then
+			GameTeleportService:TeleportToKillerSpawn(player)
+		else
+			GameTeleportService:TeleportToHouse(player)
+		end
 	end
 end
 
--- Teleporta o Killer para O Spawn
-function GameTeleportService:TeleportKillerToSpawn()
-	for _, player in Players:GetPlayers() do
-		if player:GetAttribute("IS_KILLER") then
-			player:SetAttribute("IN_HOUSE", true)
-			bridge:Fire(player, {
-				[actionIdentifier] = "TeleporToKillerSpawn",
-			})
-		end
-	end
+function GameTeleportService:TeleportToHouse(player)
+	pcall(function()
+		bridge:Fire(player, {
+			[actionIdentifier] = "TeleportToHouse",
+		})
+	end)
+end
+
+function GameTeleportService:TeleportToKillerSpawn(player)
+	pcall(function()
+		bridge:Fire(player, {
+			[actionIdentifier] = "TeleporToKillerSpawn",
+		})
+	end)
 end
 
 function GameTeleportService:TeleportToLobby(player: Player)

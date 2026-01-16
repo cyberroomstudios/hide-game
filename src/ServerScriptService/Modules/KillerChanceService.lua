@@ -12,16 +12,29 @@ function KillerChanceService:Init() end
 
 function KillerChanceService:ResetChance(player: Player)
 	KillerChanceService:StartInitialChance(player)
+
+	PlayerDataHandler:Update(player, "killerChance", function(current)
+		return MIN_CHANCE
+	end)
 end
 
 function KillerChanceService:IncrementChance(player: Player)
 	local oldChance = player:GetAttribute("KILLER_CHANCE") or 3
 	player:SetAttribute("KILLER_CHANCE", oldChance + INCREMENT_CHANCE)
+
+	-- Atualizando na base do jogador
+	PlayerDataHandler:Update(player, "killerChance", function(current)
+		return current + INCREMENT_CHANCE
+	end)
 end
 
 function KillerChanceService:StartInitialChance(player: Player)
 	local hasToBeKillerGamepass = PlayerDataHandler:Get(player, "hasToBeKillerGamepass")
-	player:SetAttribute("KILLER_CHANCE", hasToBeKillerGamepass and MIN_CHANCE_WITH_GAMEPASS or MIN_CHANCE)
+	local currentKillerChanceFromDataBase = PlayerDataHandler:Get(player, "killerChance")
+	currentKillerChanceFromDataBase = hasToBeKillerGamepass
+			and (currentKillerChanceFromDataBase + MIN_CHANCE_WITH_GAMEPASS)
+		or currentKillerChanceFromDataBase
+	player:SetAttribute("KILLER_CHANCE", currentKillerChanceFromDataBase)
 end
 
 function KillerChanceService:DrawPlayerByChance()

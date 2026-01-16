@@ -125,6 +125,7 @@ function GameLoopController:VerifyGameStep()
 
 	if gameStep == "PLAYERS_HIDING" then
 		GameLoopController:ShowHideMessage()
+		print("Voce é o Killer")
 	end
 
 	if gameStep == "KILLER_IN_PROGRESS" then

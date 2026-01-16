@@ -7,9 +7,9 @@ local ReplionClient = Replion.Client
 local PlayerData = ReplionClient:WaitReplion("PlayerData")
 
 function DataController:Init()
-    PlayerData:OnChange("money", function(newMoney)
-        print("Seu dinheiro agora é: " .. newMoney)
-    end)
+	PlayerData:OnChange("money", function(newMoney)
+		-- print("Seu dinheiro agora é: " .. newMoney)
+	end)
 end
 
 return DataController

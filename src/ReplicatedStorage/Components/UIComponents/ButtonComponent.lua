@@ -70,11 +70,15 @@ end
 function ButtonComponent:Start()
 
 	local button = self.Instance
+	local targetWindow = button.Name
+
 
 
 	button.MouseButton1Click:Connect(function()
 		ClickSound:Play()
-		toggleWindow(button.Name)
+		if targetWindow then
+			toggleWindow(targetWindow)
+		end
 	end)
 
 	button.MouseEnter:Connect(function()

@@ -5,7 +5,10 @@ local Workspace = game:GetService("Workspace")
 
 local UIReferences = require(Players.LocalPlayer.PlayerScripts.Util.UIReferences)
 local HudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.HudController)
-local KillerHudController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerHudController)
+local TeleportController = require(Players.LocalPlayer.PlayerScripts.ClientModules.TeleportController)
+local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules.CameraController)
+local PlayerController = require(Players.LocalPlayer.PlayerScripts.ClientModules.PlayerController)
+local HouseController = require(Players.LocalPlayer.PlayerScripts.ClientModules.HouseController)
 
 local labels = {}
 local screens = {}
@@ -21,6 +24,7 @@ end
 function GameLoopController:CreateReferences()
 	labels["WAIT_START_GAME"] = UIReferences:GetReference("WAIT_START_GAME")
 	labels["HIDE_MESSAGE"] = UIReferences:GetReference("HIDE_MESSAGE")
+
 	labels["KILLER_IN_PROGRESS"] = UIReferences:GetReference("KILLER_IN_PROGRESS")
 end
 
@@ -100,6 +104,23 @@ function GameLoopController:ShowHideMessage()
 	end)
 end
 
+function GameLoopController:ShowHideMessageWhenKiller()
+	GameLoopController:OpenLabel("HIDE_MESSAGE")
+	task.spawn(function()
+		local hideLabel = labels["HIDE_MESSAGE"]
+
+		while workspace:GetAttribute("GAME_STEP") == "PLAYERS_HIDING" do
+			local leftTime = workspace:GetAttribute("TIME_FOR_HIDE") or 10
+			local isKiller = player:GetAttribute("IS_KILLER")
+
+			hideLabel.Text = isKiller and ("Waiting for the players to hide! (" .. leftTime .. ")")
+				or ("Hide! (" .. leftTime .. ")")
+
+			task.wait(1)
+		end
+	end)
+end
+
 function GameLoopController:ShowKillerInProgressMessage()
 	GameLoopController:OpenLabel("KILLER_IN_PROGRESS")
 end
@@ -124,8 +145,20 @@ function GameLoopController:VerifyGameStep()
 	end
 
 	if gameStep == "PLAYERS_HIDING" then
+		-- Se for o killer:
+		-- 1° Tem que teleportar ele para fora da casa
+		-- 2° Muda a visão dele para o topo da casa
+		-- 3° Bloqueia os movimentos
+		-- 4º Ativa os botões da casa
+
+		if player:GetAttribute("IS_KILLER") then
+			TeleportController:ToKillerSpawn()
+			CameraController:MoveToHouse()
+			PlayerController:LockMovement()
+			HouseController:ShowRoomUI()
+		end
+
 		GameLoopController:ShowHideMessage()
-		print("Voce é o Killer")
 	end
 
 	if gameStep == "KILLER_IN_PROGRESS" then
@@ -133,7 +166,6 @@ function GameLoopController:VerifyGameStep()
 
 		if player:GetAttribute("IS_KILLER") then
 			GameLoopController:CloseAllLabels()
-			KillerHudController:Open()
 		else
 			GameLoopController:ShowKillerInProgressMessage()
 		end

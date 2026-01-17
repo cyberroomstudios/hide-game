@@ -24,4 +24,5 @@ end
 function HudController:HideDefaultHud() end
 
 function HudController:ShowDefaultHud() end
+
 return HudController

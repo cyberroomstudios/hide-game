@@ -9,6 +9,7 @@ local ORIGINAL_TRANSPARENCY = 0.85
 local buttons = {}
 local rooms = {}
 
+local waitForPlayersHideTextLabel
 function HouseController:Init()
 	HouseController:CreateReferences()
 	HouseController:ConfigureButtonListeners()
@@ -38,11 +39,20 @@ function HouseController:CreateReferences()
 	rooms["laundry"] = ClientUtil:WaitForDescendants(roomUI, "laundry")
 	rooms["livingRoom"] = ClientUtil:WaitForDescendants(roomUI, "livingRoom")
 	rooms["storage"] = ClientUtil:WaitForDescendants(roomUI, "storage")
+
+	waitForPlayersHideTextLabel = UIReferences:GetReference("WAIT_FOR_THE_PLAYERS_TO_HIDE")
 end
 
 function HouseController:ConfigureButtonListeners()
 	for name, button in pairs(buttons) do
 		button.MouseButton1Click:Connect(function()
+			if workspace:GetAttribute("GAME_STEP") ~= "KILLER_IN_PROGRESS" then
+				waitForPlayersHideTextLabel.Visible = true
+				task.delay(1, function()
+					waitForPlayersHideTextLabel.Visible = false
+				end)
+				return
+			end
 			rooms[name].Color = ClientUtil:Color3(255, 0, 0)
 		end)
 	end

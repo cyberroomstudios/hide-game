@@ -24,7 +24,6 @@ local CameraService = require(ServerScriptService.Modules.CameraService)
 local VictoryOrDefeatService = require(ServerScriptService.Modules.VictoryOrDefeatService)
 local GamePathFindingService = require(ServerScriptService.Modules.GamePathFindingService)
 
-
 local selectedRoom = nil
 
 function EnemyService:Init()
@@ -40,9 +39,6 @@ function EnemyService:InitBridgeListener()
 		end
 	end
 end
-
-
-
 
 function EnemyService:SpawnEnemy()
 	local killer = Killers:GetChildren()[math.random(1, #Killers:GetChildren())]:Clone()
@@ -73,7 +69,7 @@ function EnemyService:SpawnEnemy()
 
 		killer:SetAttribute("State", "Walk")
 		GamePathFindingService:MoveToTarget(killer, targetPoint)
-		
+
 		CameraService:SetAllPlayerToRoomView(targetPoint.Name)
 		print("Killer moved to room: " .. targetPoint.Name)
 		task.wait(5)
@@ -102,17 +98,16 @@ function EnemyService:ClearPoints()
 	end
 end
 
-
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
 	for _, point in pairs(killedPoints:GetChildren()) do
 		point.Color = Color3.fromRGB(0, 165, 5)
 		point.Parent = hiddenPoints
 	end
-	
+
 	-- Mostra os jogadores como escondidos
 	HouseService:ShowHiddenPlayers()
-	
+
 	self:SpawnEnemy()
 	self:ClearPoints()
 end

@@ -1,4 +1,16 @@
 local HouseController = {}
+
+-- Init Bridg Net
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Utility = ReplicatedStorage.Utility
+local BridgeNet2 = require(Utility.BridgeNet2)
+local bridge = BridgeNet2.ReferenceBridge("KillerService")
+local actionIdentifier = BridgeNet2.ReferenceIdentifier("action")
+local statusIdentifier = BridgeNet2.ReferenceIdentifier("status")
+local messageIdentifier = BridgeNet2.ReferenceIdentifier("message")
+-- End Bridg Net
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local ClientUtil = require(Players.LocalPlayer.PlayerScripts.ClientModules.ClientUtil)
@@ -46,13 +58,15 @@ end
 function HouseController:ConfigureButtonListeners()
 	for name, button in pairs(buttons) do
 		button.MouseButton1Click:Connect(function()
-			if workspace:GetAttribute("GAME_STEP") ~= "KILLER_IN_PROGRESS" then
-				waitForPlayersHideTextLabel.Visible = true
-				task.delay(1, function()
-					waitForPlayersHideTextLabel.Visible = false
-				end)
-				return
-			end
+			local roomNumber = button:GetAttribute("ROOM_NUMBER")
+
+			local result = bridge:InvokeServerAsync({
+				[actionIdentifier] = "GoToRoom",
+				data = {
+					RoomNumber = roomNumber,
+				},
+			})
+
 			rooms[name].Color = ClientUtil:Color3(255, 0, 0)
 		end)
 	end

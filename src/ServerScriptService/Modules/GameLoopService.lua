@@ -112,6 +112,7 @@ end
 function GameLoopService:StartKillerStep()
 	workspace:SetAttribute("GAME_STEP", "KILLER_IN_PROGRESS")
 	EnemyService:StartKiller()
+	
 end
 
 function GameLoopService:GiveWin()

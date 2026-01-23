@@ -59,7 +59,7 @@ function GamePathFindingService:MoveToTarget(npc, targetPoint)
 			humanoid.MoveToFinished:Wait()
 		end
 		targetPoint.Color = Color3.fromRGB(255, 0, 0)
-		targetPoint.Parent = killedPoints
+		--targetPoint.Parent = killedPoints
 
 		for _ , imageLabel in pairs(targetPoint:GetDescendants()) do
 			if imageLabel:IsA("ImageLabel") then

@@ -26,6 +26,17 @@ local GamePathFindingService = require(ServerScriptService.Modules.GamePathFindi
 
 local selectedRoom = nil
 
+--BEDROOM1 = 1
+--CLOSET2 = 2
+--CLOSET1 = 3
+--BATHROOM2 = 4
+--BATHROOM1 = 5
+--KITCHEN = 6
+--STORAGE = 7
+--LIVING_ROOM = 8
+--LAUNDRY = 9
+--BEDROOM2 = 10
+
 function EnemyService:Init()
 	print("Enemy Service Initialized")
 	EnemyService:InitBridgeListener()
@@ -50,17 +61,26 @@ function EnemyService:SpawnEnemy()
 	while #hiddenPoints:GetChildren() > math.floor(totalHiddenPoints / 2) do
 		selectedRoom = nil
 
-		for x = 1, 5 do
+		for x = 5, 1, -1 do
+			workspace:SetAttribute("TIME_TO_CHOOSE_ROOM_BY_KILLER", x)
 			if selectedRoom then
 				break
 			end
 			task.wait(1)
 		end
 
+		workspace:SetAttribute("TIME_TO_CHOOSE_ROOM_BY_KILLER", 0)
+
 		local randomPoint
 
 		if selectedRoom then
-			randomPoint = hiddenPoints:FindFirstChild(tostring(selectedRoom))
+			print(tostring(selectedRoom))
+			for index, value in hiddenPoints:GetChildren() do
+				if value.Name == tostring(selectedRoom) then
+					randomPoint = value
+				end
+				print(value.Name)
+			end
 		else
 			randomPoint = hiddenPoints:GetChildren()[math.random(1, #hiddenPoints:GetChildren())]
 		end
@@ -100,11 +120,8 @@ end
 
 function EnemyService:StartKiller()
 	-- TODO Implementar Lógica de Aguardar os Comandos para levar o Killer para os comados
-	for _, point in pairs(killedPoints:GetChildren()) do
-		point.Color = Color3.fromRGB(0, 165, 5)
-		point.Parent = hiddenPoints
-	end
 
+	-- Aguarda até 5 segundos para o jogador
 	-- Mostra os jogadores como escondidos
 	HouseService:ShowHiddenPlayers()
 

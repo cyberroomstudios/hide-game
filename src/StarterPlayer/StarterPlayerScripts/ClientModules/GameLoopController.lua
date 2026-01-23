@@ -9,6 +9,7 @@ local TeleportController = require(Players.LocalPlayer.PlayerScripts.ClientModul
 local CameraController = require(Players.LocalPlayer.PlayerScripts.ClientModules.CameraController)
 local PlayerController = require(Players.LocalPlayer.PlayerScripts.ClientModules.PlayerController)
 local HouseController = require(Players.LocalPlayer.PlayerScripts.ClientModules.HouseController)
+local KillerController = require(Players.LocalPlayer.PlayerScripts.ClientModules.KillerController)
 
 local labels = {}
 local screens = {}
@@ -152,10 +153,7 @@ function GameLoopController:VerifyGameStep()
 		-- 4º Ativa os botões da casa
 
 		if player:GetAttribute("IS_KILLER") then
-			TeleportController:ToKillerSpawn()
-			CameraController:MoveToHouse()
-			PlayerController:LockMovement()
-			HouseController:ShowRoomUI()
+			KillerController:Start()
 		end
 
 		GameLoopController:ShowHideMessage()
@@ -166,6 +164,8 @@ function GameLoopController:VerifyGameStep()
 
 		if player:GetAttribute("IS_KILLER") then
 			GameLoopController:CloseAllLabels()
+
+			HouseController:ShowRoomUI()
 		else
 			GameLoopController:ShowKillerInProgressMessage()
 		end

@@ -9,7 +9,7 @@ local GamePathFindingService = require(ServerScriptService.Modules.GamePathFindi
 local COLLIDE_GROUP_NAME = "PLAYER_OR_NPC"
 local MIN_USER_ID = 1
 local MAX_USER_ID = 20000
-local MAX_TRIES = 10
+local MAX_TRIES = 3
 
 function BotService:Init() end
 

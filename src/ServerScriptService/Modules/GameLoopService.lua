@@ -49,7 +49,7 @@ end
 function GameLoopService:WaitInitGame()
 	workspace:SetAttribute("GAME_STEP", "WAIT_INIT_GAME")
 
-	for i = 15, 0, -1 do
+	for i = 5, 0, -1 do
 		workspace:SetAttribute("TIME_FOR_INIT_GAME", i)
 		task.wait(1)
 	end

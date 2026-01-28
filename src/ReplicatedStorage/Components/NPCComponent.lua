@@ -87,7 +87,7 @@ function NPCComponent:Construct()
 	self.Trove = Trove.new()
 	self.Trove:AttachToInstance(self.Instance)
 
-	self.Humanoid = self.Instance:FindFirstChildOfClass("Humanoid")
+	self.Humanoid = self.Instance:FindFirstChildOfClass("Humanoid") or self.Instance:FindFirstChildWhichIsA("AnimationController")
 
 	-- Animações
 	self.AnimationTracks = {}
